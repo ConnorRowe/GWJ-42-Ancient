@@ -5,11 +5,14 @@ namespace Ancient
     public class GameWorld : Node2D
     {
         private static RandomNumberGenerator rng = Globals.RNG;
-        private static PackedScene FoodScene = GD.Load<PackedScene>("res://scenes/Food.tscn");
+        private static PackedScene foodScene = GD.Load<PackedScene>("res://scenes/FoodPlant.tscn");
+        private static PackedScene centiScene = GD.Load<PackedScene>("res://scenes/characters/Centipede.tscn");
+        private static PackedScene raptorScene = GD.Load<PackedScene>("res://scenes/characters/Raptor.tscn");
         private static Curve shakeCurve = GD.Load<Curve>("res://ShakeCurve.tres");
         private static Color hungerFull = new Color("397cbe");
         private static Color hungerHungry = new Color("f7e5b2");
         private static Color hungerStarving = new Color("e64e4b");
+        private static readonly Vector2 levelBounds = new Vector2(3840, 2160);
         private const int MAX_FOOD = 30;
 
         public int Level { get; set; } = 1;
@@ -26,8 +29,8 @@ namespace Ancient
         private ShaderMaterial hungerBarMat;
         private TextureRect massFill;
         private ShaderMaterial massFillMat;
-		private HandDrawnMass massText;
-        private float nextMassGoal = 50f;
+        private HandDrawnMass massText;
+        private float nextMassGoal = 15f;
 
         public override void _Ready()
         {
@@ -43,7 +46,7 @@ namespace Ancient
             hungerBarMat = (ShaderMaterial)hungerBar.Material;
             massFill = GetNode<TextureRect>("UI/Mass/Fill");
             massFillMat = (ShaderMaterial)massFill.Material;
-			massText = GetNode<HandDrawnMass>("UI/Mass/Text");
+            massText = GetNode<HandDrawnMass>("UI/Mass/Text");
         }
 
         public override void _Process(float delta)
@@ -84,14 +87,16 @@ namespace Ancient
             dash.Value = player.DashCooldown;
 
             //Mass
-            float p = player.Mass / nextMassGoal;
-            massFill.RectScale = new Vector2(.25f, .25f).LinearInterpolate(Vector2.One, p);
+            float p = Mathf.Clamp(player.Mass / nextMassGoal, 0f, 1f);
+            massFillMat.SetShaderParam("uniform_scale", Mathf.Lerp(5f, 1f, p));
             massText.Text = player.Mass.ToString("0.00");
+
+            Scale = Scale.LinearInterpolate(Vector2.One + new Vector2(p * .5f, p * .5f), delta * 2f);
         }
 
         private void SpawnFoodTimerTick()
         {
-            SpawnFood(Diets.Herb);
+            SpawnFood(rng.Randf() >= .75f ? Diets.Carn : Diets.Herb);
         }
 
         private void SpawnFood(Diets foodType)
@@ -99,27 +104,28 @@ namespace Ancient
             if (CurrentFoodCount > MAX_FOOD)
                 return;
 
-            Food food = FoodScene.Instance<Food>();
+            Node2D food = null;
 
-            food.FoodType = foodType;
-            food.FoodValue = (Level * .1f) + rng.RandfRange(0f, .1f);
-
-            switch (foodType)
+            if (foodType == Diets.Herb)
             {
-                case Diets.Herb:
-                    food.Texture = Globals.HerbTextures[Level - 1];
-                    break;
-                case Diets.Omni:
-                    break;
-                case Diets.Carn:
-                    break;
+                FoodPlant foodPlant = foodScene.Instance<FoodPlant>();
+                foodPlant.FoodValue = (Level * .1f) + rng.RandfRange(0f, .1f);
+                foodPlant.Texture = Globals.HerbTextures[Level - 1];
+                food = foodPlant;
+            }
+            else if (foodType == Diets.Carn)
+            {
+                food = rng.Randf() > .25f ? raptorScene.Instance<Node2D>() : centiScene.Instance<Node2D>();
             }
 
-            ySort.AddChild(food);
+            if (food != null)
+            {
+                ySort.AddChild(food);
 
-            food.Position = new Vector2(rng.RandfRange(0f, 3760f), rng.RandfRange(0f, 2080f));
+                food.Position = new Vector2(rng.RandfRange(200f, levelBounds.x - 200f), rng.RandfRange(200f, levelBounds.y - 200f));
 
-            CurrentFoodCount++;
+                CurrentFoodCount++;
+            }
         }
     }
 }

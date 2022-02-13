@@ -12,62 +12,22 @@
 [ext_resource path="res://textures/UI/massBG.png" type="Texture" id=10]
 [ext_resource path="res://textures/UI/massFill.png" type="Texture" id=11]
 [ext_resource path="res://scenes/HandDrawnMass.cs" type="Script" id=12]
-
-[sub_resource type="Shader" id=3]
-code = "shader_type canvas_item;
-
-uniform float fill_percent: hint_range(0.0, 1.0) = 1.0;
-uniform sampler2D fill_mask;
-uniform vec4 fill_colour: hint_color = vec4(1.0);
-uniform float strength = 6.0;
-
-void fragment()
-{
-	vec4 fill = texture(fill_mask, UV);
-	fill.a -= fill.r / fill_percent;
-	fill.a *= pow(strength, fill_percent);
-	fill.a = clamp(fill.a, 0.0, 1.0);
-	
-	COLOR = texture(TEXTURE, UV);
-	COLOR = mix(COLOR, fill_colour, fill.a);
-}"
+[ext_resource path="res://shaders/MassFill.gdshader" type="Shader" id=13]
+[ext_resource path="res://shaders/HungerBar.gdshader" type="Shader" id=14]
 
 [sub_resource type="ShaderMaterial" id=4]
-shader = SubResource( 3 )
+shader = ExtResource( 14 )
 shader_param/fill_percent = 1.0
 shader_param/fill_colour = Color( 1, 1, 1, 1 )
 shader_param/strength = 80.0
 shader_param/fill_mask = ExtResource( 4 )
 
-[sub_resource type="Shader" id=1]
-code = "shader_type canvas_item;
-
-uniform vec4 fill_colour : hint_color = vec4(1.0);
-uniform vec4 line_colour : hint_color = vec4(1.0);
-uniform float line_thickness : hint_range(0, 10) = 1.0;
-
-void fragment() {
-	vec2 size = TEXTURE_PIXEL_SIZE * line_thickness;
-	
-	float outline = texture(TEXTURE, UV + vec2(-size.x, 0)).a;
-	outline += texture(TEXTURE, UV + vec2(0, size.y)).a;
-	outline += texture(TEXTURE, UV + vec2(size.x, 0)).a;
-	outline += texture(TEXTURE, UV + vec2(0, -size.y)).a;
-	outline += texture(TEXTURE, UV + vec2(-size.x, size.y)).a;
-	outline += texture(TEXTURE, UV + vec2(size.x, size.y)).a;
-	outline += texture(TEXTURE, UV + vec2(-size.x, -size.y)).a;
-	outline += texture(TEXTURE, UV + vec2(size.x, -size.y)).a;
-	outline = min(outline, 1.0);
-	
-	vec4 color = texture(TEXTURE, UV) * fill_colour;
-	COLOR = mix(color, line_colour, outline - color.a);
-}"
-
 [sub_resource type="ShaderMaterial" id=2]
-shader = SubResource( 1 )
+shader = ExtResource( 13 )
 shader_param/fill_colour = Color( 0.956863, 0.611765, 0.682353, 1 )
-shader_param/line_colour = Color( 0.192157, 0.133333, 0.172549, 1 )
-shader_param/line_thickness = 4.8
+shader_param/outline_colour = Color( 0.254902, 0.180392, 0.2, 1 )
+shader_param/outline_thickness = 2.56
+shader_param/uniform_scale = 5.0
 
 [node name="GameWorld" type="Node2D"]
 script = ExtResource( 2 )
@@ -82,6 +42,11 @@ __meta__ = {
 
 [node name="SpawnFoodTimer" type="Timer" parent="."]
 autostart = true
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
+polygon = PoolVector2Array( 56, 1672, -8, 1672, 0, 2160, 3840, 2160, 3840, 0, -8, 0, -8, 1672, 56, 1672, 56, 56, 3784, 56, 3784, 2080, 56, 2088 )
 
 [node name="YSort" type="YSort" parent="."]
 
@@ -148,8 +113,10 @@ __meta__ = {
 }
 
 [node name="Mass" type="TextureRect" parent="UI"]
-margin_right = 40.0
-margin_bottom = 40.0
+margin_left = 16.0
+margin_top = 24.0
+margin_right = 207.0
+margin_bottom = 137.0
 texture = ExtResource( 10 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -168,7 +135,6 @@ __meta__ = {
 }
 
 [node name="Text" type="Node2D" parent="UI/Mass"]
-position = Vector2( 53, 119 )
+position = Vector2( 40, 110 )
 script = ExtResource( 12 )
-Text = "21.5"
 TextColour = Color( 0.192157, 0.133333, 0.172549, 1 )

@@ -1,13 +1,12 @@
 using Godot;
-
+using System.Collections.Generic;
 namespace Ancient
 {
-    [Tool]
     public class HandDrawnMass : Node2D
     {
         private static Texture numbers = GD.Load<Texture>("res://textures/UI/numbers.png");
         private static readonly Vector2 charSize = new Vector2(24, 36);
-        private System.Collections.Generic.Dictionary<char, int> charLUT = new System.Collections.Generic.Dictionary<char, int>() {
+        private Dictionary<char, int> charLUT = new Dictionary<char, int>() {
             { '0', 0 },
             { '1', 24 },
             { '2', 48 },
