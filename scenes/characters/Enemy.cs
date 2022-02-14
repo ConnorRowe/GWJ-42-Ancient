@@ -24,11 +24,11 @@ namespace Ancient
 
             roamTimer = GetNode<Timer>("RoamTimer");
             roamTimer.Connect("timeout", this, nameof(RoamTimeout));
-            detectionArea = GetNode<Area2D>("DetectionArea");
-            detectionArea.Connect("body_entered", this, nameof(BodyDetected));
             GetNode<Timer>("AITick").Connect("timeout", this, nameof(AITick));
             debugLabel = GetNode<Label>("debug");
             GetNode("EatArea").Connect("body_entered", this, nameof(EatAreaBodyEntered));
+
+            RoamTimeout();
         }
 
         private void RoamTimeout()
@@ -41,7 +41,7 @@ namespace Ancient
             switch (currentState)
             {
                 case BehaviourState.ROAM:
-                    if (player != null && Position.DistanceSquaredTo(player.Position) < 115600)
+                    if (player != null && Position.DistanceSquaredTo(player.Position) < 1000000f)
                     {
                         if (player.Mass < Mass)
                             currentState = BehaviourState.HUNT;
@@ -53,7 +53,7 @@ namespace Ancient
                     break;
                 case BehaviourState.HUNT:
                 case BehaviourState.FLEE:
-                    if (Position.DistanceSquaredTo(player.Position) > 129600f)
+                    if (Position.DistanceSquaredTo(player.Position) > 1032256f)
                     {
                         currentState = BehaviourState.ROAM;
                         RoamTimeout();
@@ -76,27 +76,24 @@ namespace Ancient
             }
         }
 
-        private void BodyDetected(Node body)
+        public void DetectPlayer(Player player)
         {
-            if (body is Player p)
+            this.player = player;
+
+            switch (currentState)
             {
-                player = p;
+                case BehaviourState.ROAM:
+                    if (player.Mass < Mass)
+                        currentState = BehaviourState.HUNT;
+                    else
+                        currentState = BehaviourState.FLEE;
 
-                switch (currentState)
-                {
-                    case BehaviourState.ROAM:
-                        if (p.Mass < Mass)
-                            currentState = BehaviourState.HUNT;
-                        else
-                            currentState = BehaviourState.FLEE;
-
-                        roamTimer.Stop();
-                        break;
-                    case BehaviourState.HUNT:
-                        break;
-                    case BehaviourState.FLEE:
-                        break;
-                }
+                    roamTimer.Stop();
+                    break;
+                case BehaviourState.HUNT:
+                    break;
+                case BehaviourState.FLEE:
+                    break;
             }
         }
 

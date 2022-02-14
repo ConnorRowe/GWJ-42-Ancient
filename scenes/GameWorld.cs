@@ -13,12 +13,15 @@ namespace Ancient
         private static Color hungerHungry = new Color("f7e5b2");
         private static Color hungerStarving = new Color("e64e4b");
         private static readonly Vector2 levelBounds = new Vector2(3840, 2160);
-        private const int MAX_FOOD = 30;
+        private const int MAX_PLANTS = 30;
+        private const int MAX_DINOS = 5;
 
         public int Level { get; set; } = 1;
-        public int CurrentFoodCount { get; set; } = 0;
+        public int CurrentPlantCount { get; set; } = 0;
+        public int CurrentDinoCount { get; set; } = 0;
 
         private float timeFrac = 0.0f;
+        private float nextMassGoal = 15f;
 
         private Timer spawnFoodTimer;
         private YSort ySort;
@@ -30,7 +33,7 @@ namespace Ancient
         private TextureRect massFill;
         private ShaderMaterial massFillMat;
         private HandDrawnMass massText;
-        private float nextMassGoal = 15f;
+        private Camera2D camera;
 
         public override void _Ready()
         {
@@ -47,6 +50,7 @@ namespace Ancient
             massFill = GetNode<TextureRect>("UI/Mass/Fill");
             massFillMat = (ShaderMaterial)massFill.Material;
             massText = GetNode<HandDrawnMass>("UI/Mass/Text");
+            camera = GetNode<Camera2D>("YSort/Player/Camera2D");
         }
 
         public override void _Process(float delta)
@@ -83,7 +87,6 @@ namespace Ancient
             }
 
             // Dash
-
             dash.Value = player.DashCooldown;
 
             //Mass
@@ -91,7 +94,9 @@ namespace Ancient
             massFillMat.SetShaderParam("uniform_scale", Mathf.Lerp(5f, 1f, p));
             massText.Text = player.Mass.ToString("0.00");
 
-            Scale = Scale.LinearInterpolate(Vector2.One + new Vector2(p * .5f, p * .5f), delta * 2f);
+            player.Scale = player.Scale.LinearInterpolate(new Vector2(.5f + p, .5f + p), delta * 2f);
+
+            camera.GlobalScale = Vector2.One;
         }
 
         private void SpawnFoodTimerTick()
@@ -101,21 +106,26 @@ namespace Ancient
 
         private void SpawnFood(Diets foodType)
         {
-            if (CurrentFoodCount > MAX_FOOD)
-                return;
-
             Node2D food = null;
 
             if (foodType == Diets.Herb)
             {
+                if (CurrentPlantCount > MAX_PLANTS)
+                    return;
+
                 FoodPlant foodPlant = foodScene.Instance<FoodPlant>();
                 foodPlant.FoodValue = (Level * .1f) + rng.RandfRange(0f, .1f);
                 foodPlant.Texture = Globals.HerbTextures[Level - 1];
                 food = foodPlant;
+                CurrentPlantCount++;
             }
             else if (foodType == Diets.Carn)
             {
-                food = rng.Randf() > .25f ? raptorScene.Instance<Node2D>() : centiScene.Instance<Node2D>();
+                if (CurrentDinoCount > MAX_DINOS)
+                    return;
+
+                food = rng.Randf() < .25f ? raptorScene.Instance<Node2D>() : centiScene.Instance<Node2D>();
+                CurrentDinoCount++;
             }
 
             if (food != null)
@@ -123,8 +133,6 @@ namespace Ancient
                 ySort.AddChild(food);
 
                 food.Position = new Vector2(rng.RandfRange(200f, levelBounds.x - 200f), rng.RandfRange(200f, levelBounds.y - 200f));
-
-                CurrentFoodCount++;
             }
         }
     }

@@ -48,8 +48,9 @@ namespace Ancient
             eatArea.Connect("area_entered", this, nameof(EatAreaEntered));
             eatArea.Connect("body_entered", this, nameof(EatAreaBodyEntered));
             gameWorld = (GameWorld)Owner;
+            GetNode("EnemyDetectionArea").Connect("body_entered", this, nameof(EnemyDetectionAreaBodyEntered));
 
-            mass = 1f;
+            mass = .5f;
         }
 
         public override void _Input(InputEvent evt)
@@ -126,7 +127,7 @@ namespace Ancient
 
             mass += food.FoodValue * 2f;
 
-            gameWorld.CurrentFoodCount--;
+            gameWorld.CurrentPlantCount--;
         }
 
         private void EatAreaBodyEntered(Node body)
@@ -138,6 +139,8 @@ namespace Ancient
                     mass += enemy.Mass;
                     AddHunger(enemy.Mass * .5f);
                     enemy.QueueFree();
+
+                    gameWorld.CurrentDinoCount--;
                 }
             }
         }
@@ -147,6 +150,14 @@ namespace Ancient
             hunger += hungerAmount;
             if (hunger > 1f)
                 hunger = 1f;
+        }
+
+        private void EnemyDetectionAreaBodyEntered(Node body)
+        {
+            if(body is Enemy enemy)
+            {
+                enemy.DetectPlayer(this);
+            }
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Ancient
             segments[2] = GetNode<Sprite>("Body3");
             segments[3] = GetNode<Sprite>("Body4");
 
-            mass = .5f;
+            mass = 1.5f;
         }
 
         public override void _PhysicsProcess(float delta)

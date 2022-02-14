@@ -44,7 +44,7 @@ offset = Vector2( 16, -2 )
 position = Vector2( 13, 3 )
 rotation = 1.81025
 
-[node name="BodyCollision" type="CollisionShape2D" parent="." index="10"]
+[node name="BodyCollision" type="CollisionShape2D" parent="." index="9"]
 position = Vector2( -29, 0 )
 rotation = 1.57079
 shape = SubResource( 1 )
