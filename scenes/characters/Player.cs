@@ -8,6 +8,7 @@ namespace Ancient
         public float Hunger { get { return hunger; } }
         public float DashCooldown { get; set; } = 0.0f;
         public Diets Diet { get; set; } = Diets.Herb;
+        public GameWorld GameWorld { get { return gameWorld; } }
 
         private AnimationPlayer animationPlayer;
         private Sprite head;
@@ -50,16 +51,24 @@ namespace Ancient
             gameWorld = (GameWorld)Owner;
             GetNode("EnemyDetectionArea").Connect("body_entered", this, nameof(EnemyDetectionAreaBodyEntered));
 
-            mass = .5f;
+            Scale = new Vector2(.5f, .5f);
         }
 
         public override void _Input(InputEvent evt)
         {
             if (evt.IsActionPressed("g_dash") && DashCooldown <= 0f && inputDir != Vector2.Zero)
             {
-                externalVelocity += inputDir * 800f;
+                ApplyExternalImpulse(inputDir * 800f);
                 DashCooldown = 1.0f;
                 hunger -= .1f;
+
+                gameWorld.ShakeDash();
+            }
+
+            if (evt is InputEventKey ek && ek.Pressed && ek.Scancode == (int)KeyList.B)
+            {
+                gameWorld.MakeBloodBurst(GlobalPosition);
+
             }
         }
 
@@ -123,9 +132,9 @@ namespace Ancient
 
         private void ConsumeFood(FoodPlant food)
         {
-            AddHunger(food.FoodValue);
+            AddHunger(food.FoodValue * .5f);
 
-            mass += food.FoodValue * 2f;
+            AddMass(food.FoodValue);
 
             gameWorld.CurrentPlantCount--;
         }
@@ -141,11 +150,13 @@ namespace Ancient
                     enemy.QueueFree();
 
                     gameWorld.CurrentDinoCount--;
+
+                    gameWorld.MakeBloodBurst(eatArea.GlobalPosition);
                 }
             }
         }
 
-        private void AddHunger(float hungerAmount)
+        public void AddHunger(float hungerAmount)
         {
             hunger += hungerAmount;
             if (hunger > 1f)
@@ -154,9 +165,20 @@ namespace Ancient
 
         private void EnemyDetectionAreaBodyEntered(Node body)
         {
-            if(body is Enemy enemy)
+            if (body is Enemy enemy)
             {
                 enemy.DetectPlayer(this);
+            }
+        }
+
+        public void AddMass(float mass)
+        {
+            this.mass += mass;
+
+            if (mass <= 0f)
+            {
+                //Die
+                mass = .1f;
             }
         }
     }

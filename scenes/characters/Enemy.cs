@@ -4,18 +4,17 @@ namespace Ancient
 {
     public class Enemy : Character
     {
-        private enum BehaviourState
+        protected enum BehaviourState
         {
             ROAM,
             HUNT,
             FLEE
         }
 
-        private BehaviourState currentState = BehaviourState.ROAM;
+        protected BehaviourState currentState = BehaviourState.ROAM;
         private Vector2 targetPos = Vector2.Zero;
         private Timer roamTimer;
-        private Player player;
-        private Area2D detectionArea;
+        protected Player player;
         private Label debugLabel;
 
         public override void _Ready()
@@ -36,7 +35,7 @@ namespace Ancient
             targetPos = new Vector2(Globals.RNG.RandfRange(0f, 3760f), Globals.RNG.RandfRange(0f, 2080f));
         }
 
-        private void AITick()
+        protected virtual void AITick()
         {
             switch (currentState)
             {
@@ -59,6 +58,9 @@ namespace Ancient
                         RoamTimeout();
                         roamTimer.Start();
                     }
+                    else if (currentState == BehaviourState.HUNT && player.Mass > mass)
+                        currentState = BehaviourState.FLEE;
+
                     break;
             }
 
@@ -119,10 +121,14 @@ namespace Ancient
             {
                 if (p.Mass < mass)
                 {
-                    // KILL PLAYER
-                    GD.Print("YA GOTT ATE BOI");
+                    BitePlayer(p);
                 }
             }
+        }
+
+        protected virtual void BitePlayer(Player player)
+        {
+            GD.Print("YA GOTT ATE BOI");
         }
     }
 }

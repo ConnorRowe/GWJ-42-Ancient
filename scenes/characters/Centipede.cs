@@ -4,7 +4,7 @@ namespace Ancient
 {
     public class Centipede : Enemy
     {
-        private Sprite[] segments = new Sprite[4];
+        private Sprite[] segments = new Sprite[3];
         private Vector2 baseSegOffset = new Vector2(1, 6);
         private float physTimeFrac = 0f;
         private float animVal = 0f;
@@ -16,9 +16,6 @@ namespace Ancient
             segments[0] = GetNode<Sprite>("Body1");
             segments[1] = GetNode<Sprite>("Body2");
             segments[2] = GetNode<Sprite>("Body3");
-            segments[3] = GetNode<Sprite>("Body4");
-
-            mass = 1.5f;
         }
 
         public override void _PhysicsProcess(float delta)
@@ -34,9 +31,9 @@ namespace Ancient
                 animVal -= Mathf.Tau;
 
             // Animate segments
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 3; i++)
             {
-                segments[i].Offset = baseSegOffset + new Vector2(0, Mathf.Cos(animVal + ((((float)i) / 4f) * Mathf.Tau)) * 6f);
+                segments[i].Offset = baseSegOffset + new Vector2(0, Mathf.Cos(animVal + ((((float)i) / 3f) * Mathf.Tau)) * 6f);
             }
 
             // TODO Mirror movement to collision shapes

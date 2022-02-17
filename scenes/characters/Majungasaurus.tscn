@@ -1,15 +1,15 @@
 [gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://scenes/characters/Enemy.tscn" type="PackedScene" id=1]
-[ext_resource path="res://textures/evildinohead.png" type="Texture" id=2]
-[ext_resource path="res://textures/evildinobody.png" type="Texture" id=3]
-[ext_resource path="res://textures/evildinotalon.png" type="Texture" id=4]
-[ext_resource path="res://textures/evildinoleg.png" type="Texture" id=5]
+[ext_resource path="res://textures/majunga head.png" type="Texture" id=2]
+[ext_resource path="res://textures/majunga arm.png" type="Texture" id=3]
+[ext_resource path="res://textures/majunga leg.png" type="Texture" id=4]
+[ext_resource path="res://textures/majunga body.png" type="Texture" id=5]
 [ext_resource path="res://scenes/characters/Raptor.cs" type="Script" id=6]
 
-[sub_resource type="CapsuleShape2D" id=1]
-radius = 31.6196
-height = 63.9996
+[sub_resource type="CapsuleShape2D" id=3]
+radius = 48.907
+height = 83.5676
 
 [sub_resource type="Animation" id=2]
 resource_name = "Walk"
@@ -65,69 +65,73 @@ tracks/3/keys = {
 "values": [ 13.0, -13.0, 13.0 ]
 }
 
-[sub_resource type="CapsuleShape2D" id=3]
-radius = 47.0001
-height = 65.9999
-
 [sub_resource type="CapsuleShape2D" id=4]
-radius = 26.0
-height = 53.9994
+radius = 47.0001
+height = 156.0
+
+[sub_resource type="CapsuleShape2D" id=5]
+radius = 41.0003
+height = 76.0
 
 [node name="Raptor" instance=ExtResource( 1 )]
 script = ExtResource( 6 )
 acceleration = 500.0
 maxSpeed = 2000.0
 movementDampening = 0.8
-mass = 20.0
+mass = 200.0
 bodyPartPathsToFlip = [ NodePath("EatArea/CollisionShape2D"), NodePath("LFoot"), NodePath("Body"), NodePath("RFoot"), NodePath("Arm"), NodePath("Head"), NodePath("CollisionShape2D"), NodePath("CollisionShape2D3"), NodePath("Shadow") ]
 
-[node name="Shadow" parent="." index="0"]
-margin_left = -89.0
-margin_top = -23.0
-margin_right = 89.0
-margin_bottom = 32.0
-
 [node name="CollisionShape2D" parent="EatArea" index="0"]
-position = Vector2( 136, -64 )
-rotation = 1.96272
-shape = SubResource( 1 )
+position = Vector2( 158, -183 )
+rotation = 1.71023
+shape = SubResource( 3 )
+
+[node name="Shadow" parent="." index="4"]
+margin_left = -153.0
+margin_top = -37.0
+margin_right = 150.0
+margin_bottom = 47.0
 
 [node name="LFoot" type="Sprite" parent="." index="5"]
-position = Vector2( 0.77301, -32.7499 )
-rotation = -0.279253
-texture = ExtResource( 5 )
-offset = Vector2( 0.549171, 13.4212 )
+position = Vector2( -5.99999, -121 )
+rotation = -0.161719
+texture = ExtResource( 4 )
+offset = Vector2( 19.0482, 55.8286 )
+__meta__ = {
+"_editor_description_": ""
+}
 
 [node name="Body" type="Sprite" parent="." index="6"]
-position = Vector2( -35, -60 )
-texture = ExtResource( 3 )
+position = Vector2( -40.5, -111.464 )
+texture = ExtResource( 5 )
 
 [node name="RFoot" type="Sprite" parent="." index="7"]
-position = Vector2( -16.466, -21.8182 )
-rotation = 0.279253
-texture = ExtResource( 5 )
-offset = Vector2( 3.9808, 12.1933 )
+position = Vector2( -38.1904, -106.856 )
+rotation = 0.161719
+texture = ExtResource( 4 )
+offset = Vector2( 19.0482, 55.8286 )
 
 [node name="Arm" type="Sprite" parent="." index="8"]
-position = Vector2( 47, -30 )
-rotation = 0.226893
-texture = ExtResource( 4 )
+position = Vector2( 91.2346, -84.3892 )
+rotation = 0.131397
+texture = ExtResource( 3 )
+offset = Vector2( 16.7407, 8.2146 )
 
 [node name="Head" type="Sprite" parent="." index="9"]
-position = Vector2( 100.839, -81.9423 )
-rotation = 0.0698132
+position = Vector2( 115.595, -153 )
+rotation = 0.0330839
 texture = ExtResource( 2 )
-offset = Vector2( 41.9632, 10.0396 )
+offset = Vector2( 45.9253, -26.1268 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." index="10"]
 anims/Walk = SubResource( 2 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." index="11"]
-position = Vector2( -1, -53 )
-rotation = 1.57079
-shape = SubResource( 3 )
-
-[node name="CollisionShape2D3" type="CollisionShape2D" parent="." index="12"]
-position = Vector2( 132, -72 )
+position = Vector2( -4, -93.4635 )
 rotation = 1.57079
 shape = SubResource( 4 )
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="." index="12"]
+position = Vector2( 151, -181 )
+rotation = 1.57079
+shape = SubResource( 5 )

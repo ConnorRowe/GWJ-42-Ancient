@@ -7,6 +7,7 @@ namespace Ancient
     {
         public float Mass { get { return mass; } }
         public bool IsFacingRight { get { return isFacingRight; } }
+        public float SpeedScale { get; set; } = 1f;
 
         protected Vector2 inputDir = Vector2.Zero;
         [Export]
@@ -17,8 +18,9 @@ namespace Ancient
         protected float movementDampening = 5f;
         protected Vector2 velocity = Vector2.Zero;
         protected Vector2 externalVelocity = Vector2.Zero;
+        [Export]
         protected float mass = 1f;
-        protected HashSet<Node2D> bodyPartsToFlip = new HashSet<Node2D>();
+        protected HashSet<Node> bodyPartsToFlip = new HashSet<Node>();
         [Export]
         private Godot.Collections.Array<NodePath> bodyPartPathsToFlip = new Godot.Collections.Array<NodePath>();
         private bool isFacingRight = true;
@@ -29,7 +31,7 @@ namespace Ancient
 
             foreach (NodePath path in bodyPartPathsToFlip)
             {
-                Node2D n = GetNodeOrNull<Node2D>(path);
+                Node n = GetNodeOrNull(path);
                 if (n != null)
                 {
                     bodyPartsToFlip.Add(n);
@@ -43,13 +45,13 @@ namespace Ancient
 
             velocity -= (velocity * movementDampening * delta);
 
-            velocity += inputDir * acceleration * delta;
+            velocity += inputDir * acceleration * delta * SpeedScale;
 
             externalVelocity -= (externalVelocity * 2f * delta);
 
-            if (velocity.Length() > maxSpeed)
+            if (velocity.Length() > maxSpeed * SpeedScale)
             {
-                velocity = velocity.Normalized() * maxSpeed;
+                velocity = velocity.Normalized() * maxSpeed * SpeedScale;
             }
 
             MoveAndSlide(velocity + externalVelocity);
@@ -66,6 +68,9 @@ namespace Ancient
                     FlipDirection();
                 }
             }
+
+            ZAsRelative = false;
+            ZIndex = (int)GlobalPosition.y;
         }
 
         protected virtual Vector2 GetInputDir()
@@ -75,7 +80,7 @@ namespace Ancient
 
         private void FlipDirection()
         {
-            foreach (Node2D bodyPart in bodyPartsToFlip)
+            foreach (Node bodyPart in bodyPartsToFlip)
             {
                 FlipBodyPart(bodyPart);
             }
@@ -83,10 +88,23 @@ namespace Ancient
             isFacingRight = !isFacingRight;
         }
 
-        private void FlipBodyPart(Node2D bodyPart)
+        private void FlipBodyPart(Node bodyPart)
         {
-            bodyPart.Position = new Vector2(-bodyPart.Position.x, bodyPart.Position.y);
-            bodyPart.Scale = new Vector2(-bodyPart.Scale.x, bodyPart.Scale.y);
+            if (bodyPart is Node2D node2D)
+            {
+                node2D.Position = new Vector2(-node2D.Position.x, node2D.Position.y);
+                node2D.Scale = new Vector2(-node2D.Scale.x, node2D.Scale.y);
+            }
+            else if (bodyPart is Control control)
+            {
+                control.RectPosition = new Vector2(-control.RectPosition.x, control.RectPosition.y);
+                control.RectScale = new Vector2(-control.RectScale.x, control.RectScale.y);
+            }
+        }
+
+        public void ApplyExternalImpulse(Vector2 impulse)
+        {
+            externalVelocity += impulse;
         }
     }
 }

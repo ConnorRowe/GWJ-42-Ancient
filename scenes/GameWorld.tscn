@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=28 format=2]
 
 [ext_resource path="res://scenes/characters/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://scenes/GameWorld.cs" type="Script" id=2]
@@ -16,6 +16,19 @@
 [ext_resource path="res://shaders/HungerBar.gdshader" type="Shader" id=14]
 [ext_resource path="res://textures/levelborder.png" type="Texture" id=15]
 [ext_resource path="res://textures/floors/floor_grass.png" type="Texture" id=16]
+[ext_resource path="res://scenes/Trees.tscn" type="PackedScene" id=17]
+[ext_resource path="res://textures/volcano.png" type="Texture" id=18]
+[ext_resource path="res://shaders/SimpleBlur.gdshader" type="Shader" id=19]
+[ext_resource path="res://shaders/MetaballBlood.gdshader" type="Shader" id=21]
+
+[sub_resource type="ShaderMaterial" id=11]
+shader = ExtResource( 21 )
+shader_param/threshhold = 0.715
+shader_param/contrast = 1.126
+shader_param/base_colour = Color( 0.901961, 0.305882, 0.294118, 1 )
+
+[sub_resource type="ViewportTexture" id=12]
+viewport_path = NodePath("UI/BloodViewport")
 
 [sub_resource type="ShaderMaterial" id=4]
 shader = ExtResource( 14 )
@@ -31,6 +44,128 @@ shader_param/outline_colour = Color( 0.254902, 0.180392, 0.2, 1 )
 shader_param/outline_thickness = 2.56
 shader_param/uniform_scale = 5.0
 
+[sub_resource type="ShaderMaterial" id=6]
+shader = ExtResource( 19 )
+shader_param/lod = 0.0
+
+[sub_resource type="Animation" id=8]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:material:shader_param/lod")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 0.0 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("../WhiteOut:color")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Color( 0.929412, 0.929412, 0.929412, 0 ) ]
+}
+
+[sub_resource type="Animation" id=7]
+resource_name = "WorldGrow"
+length = 2.0
+step = 0.05
+tracks/0/type = "value"
+tracks/0/path = NodePath("../..:TimeScale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.248906, 1.74234, 1.99125 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 1.0, 0.1, 0.1, 1.0 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath(".:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 1.99125 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath(".:material:shader_param/lod")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.995625, 1.99125 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ 0.0, 5.0, 0.0 ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("../WhiteOut:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 1.99125 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("../WhiteOut:color")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0, 0.995625, 1.94147 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 0.929412, 0.929412, 0.929412, 0 ), Color( 0.929412, 0.929412, 0.929412, 1 ), Color( 0.929412, 0.929412, 0.929412, 0 ) ]
+}
+tracks/5/type = "method"
+tracks/5/path = NodePath("../..")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"times": PoolRealArray( 0.995625 ),
+"transitions": PoolRealArray( 1 ),
+"values": [ {
+"args": [  ],
+"method": "GrowWorld"
+} ]
+}
+tracks/6/type = "value"
+tracks/6/path = NodePath("../..:IsWorldGrowing")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/keys = {
+"times": PoolRealArray( 2 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ false ]
+}
+
 [node name="GameWorld" type="Node2D"]
 script = ExtResource( 2 )
 
@@ -40,11 +175,17 @@ margin_bottom = 2160.0
 texture = ExtResource( 16 )
 expand = true
 stretch_mode = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="TextureRect" type="TextureRect" parent="FloorBG"]
 margin_right = 40.0
 margin_bottom = 40.0
 texture = ExtResource( 15 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="TextureRect2" type="TextureRect" parent="FloorBG"]
 margin_left = 1920.0
@@ -68,6 +209,9 @@ margin_right = 1920.0
 margin_bottom = 2160.0
 texture = ExtResource( 15 )
 flip_v = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="SpawnFoodTimer" type="Timer" parent="."]
 autostart = true
@@ -77,12 +221,55 @@ autostart = true
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
 polygon = PoolVector2Array( 56, 1672, -8, 1672, 0, 2160, 3840, 2160, 3840, 0, -8, 0, -8, 1672, 56, 1672, 56, 56, 3784, 56, 3784, 2080, 56, 2088 )
 
-[node name="YSort" type="YSort" parent="."]
+[node name="TinyStuff" type="Node2D" parent="."]
 
-[node name="Player" parent="YSort" instance=ExtResource( 1 )]
+[node name="Trees" parent="." instance=ExtResource( 17 )]
+
+[node name="Volcanos" type="Node2D" parent="."]
+visible = false
+
+[node name="Sprite" type="Sprite" parent="Volcanos"]
+position = Vector2( 781, 257 )
+texture = ExtResource( 18 )
+
+[node name="Sprite2" type="Sprite" parent="Volcanos"]
+position = Vector2( 1914, 1012 )
+texture = ExtResource( 18 )
+
+[node name="Sprite3" type="Sprite" parent="Volcanos"]
+position = Vector2( 991, 1866 )
+texture = ExtResource( 18 )
+
+[node name="Sprite4" type="Sprite" parent="Volcanos"]
+position = Vector2( 2843, 1491 )
+texture = ExtResource( 18 )
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Volcanos"]
+collision_layer = 0
+collision_mask = 0
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Volcanos/StaticBody2D"]
+position = Vector2( 777, 338 )
+polygon = PoolVector2Array( -205, -7, -1, 40, 236, -6, 6, -68 )
+
+[node name="CollisionPolygon2D2" type="CollisionPolygon2D" parent="Volcanos/StaticBody2D"]
+position = Vector2( 1910, 1095 )
+polygon = PoolVector2Array( -205, -7, -1, 40, 236, -6, 6, -68 )
+
+[node name="CollisionPolygon2D3" type="CollisionPolygon2D" parent="Volcanos/StaticBody2D"]
+position = Vector2( 2836, 1574 )
+polygon = PoolVector2Array( -205, -7, -1, 40, 236, -6, 6, -68 )
+
+[node name="CollisionPolygon2D4" type="CollisionPolygon2D" parent="Volcanos/StaticBody2D"]
+position = Vector2( 984, 1948 )
+polygon = PoolVector2Array( -205, -7, -1, 40, 236, -6, 6, -68 )
+
+[node name="CurrentStuff" type="Node2D" parent="."]
+
+[node name="Player" parent="CurrentStuff" instance=ExtResource( 1 )]
 position = Vector2( 935, 548 )
 
-[node name="Camera2D" type="Camera2D" parent="YSort/Player"]
+[node name="Camera2D" type="Camera2D" parent="CurrentStuff/Player"]
 current = true
 limit_left = 0
 limit_top = 0
@@ -91,12 +278,44 @@ limit_bottom = 2160
 
 [node name="UI" type="CanvasLayer" parent="."]
 
+[node name="BloodViewport" type="Viewport" parent="UI"]
+size = Vector2( 1920, 1080 )
+handle_input_locally = false
+hdr = false
+usage = 0
+render_target_v_flip = true
+render_target_update_mode = 3
+
+[node name="BloodBG" type="ColorRect" parent="UI/BloodViewport"]
+margin_right = 1920.0
+margin_bottom = 1080.0
+color = Color( 0, 0, 0, 1 )
+
+[node name="Camera2D" type="Camera2D" parent="UI/BloodViewport"]
+current = true
+limit_left = 0
+limit_top = 0
+limit_right = 3840
+limit_bottom = 2160
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="BloodTexture" type="TextureRect" parent="UI"]
+material = SubResource( 11 )
+margin_right = 1920.0
+margin_bottom = 1080.0
+texture = SubResource( 12 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="HungerBar" type="TextureRect" parent="UI"]
 material = SubResource( 4 )
 margin_left = 234.0
-margin_top = 50.0
+margin_top = 58.0
 margin_right = 469.0
-margin_bottom = 108.0
+margin_bottom = 116.0
 rect_pivot_offset = Vector2( 117, 4 )
 texture = ExtResource( 3 )
 __meta__ = {
@@ -115,9 +334,9 @@ __meta__ = {
 
 [node name="Dash" type="TextureProgress" parent="UI"]
 margin_left = 488.0
-margin_top = 36.0
+margin_top = 45.0
 margin_right = 601.0
-margin_bottom = 129.0
+margin_bottom = 138.0
 rect_pivot_offset = Vector2( 56, 46 )
 max_value = 1.0
 step = 0.0
@@ -165,3 +384,27 @@ __meta__ = {
 position = Vector2( 40, 110 )
 script = ExtResource( 12 )
 TextColour = Color( 0.192157, 0.133333, 0.172549, 1 )
+
+[node name="WhiteOut" type="ColorRect" parent="UI"]
+visible = false
+margin_right = 1920.0
+margin_bottom = 1080.0
+color = Color( 0.929412, 0.929412, 0.929412, 0 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Blur" type="ColorRect" parent="UI"]
+visible = false
+material = SubResource( 6 )
+margin_right = 1920.0
+margin_bottom = 1080.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+pause_mode = 2
+root_node = NodePath("../UI/Blur")
+anims/RESET = SubResource( 8 )
+anims/WorldGrow = SubResource( 7 )

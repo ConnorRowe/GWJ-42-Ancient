@@ -1,0 +1,65 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://textures/normaltree.png" type="Texture" id=1]
+[ext_resource path="res://textures/gianttree.png" type="Texture" id=2]
+
+[sub_resource type="CapsuleShape2D" id=1]
+radius = 20.0001
+height = 50.0
+
+[node name="Trees" type="Node2D"]
+
+[node name="Giant" type="StaticBody2D" parent="."]
+position = Vector2( 1465, 385 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Giant"]
+polygon = PoolVector2Array( -70, -1, -24, -11, 78, -8, 99, -1, 157, 51, 10, 70, -108, 54 )
+
+[node name="Sprite" type="Sprite" parent="Giant"]
+texture = ExtResource( 2 )
+offset = Vector2( 0, -156 )
+
+[node name="Normal" type="StaticBody2D" parent="."]
+visible = false
+collision_layer = 0
+collision_mask = 0
+
+[node name="Sprite" type="Sprite" parent="Normal"]
+position = Vector2( 385, 167 )
+texture = ExtResource( 1 )
+offset = Vector2( -7, -176 )
+
+[node name="Sprite2" type="Sprite" parent="Normal"]
+position = Vector2( 901, 1572 )
+texture = ExtResource( 1 )
+offset = Vector2( -7, -176 )
+
+[node name="Sprite3" type="Sprite" parent="Normal"]
+position = Vector2( 2986, 1962 )
+texture = ExtResource( 1 )
+offset = Vector2( -10, -181 )
+
+[node name="Sprite4" type="Sprite" parent="Normal"]
+position = Vector2( 3195, 634 )
+texture = ExtResource( 1 )
+offset = Vector2( -7, -176 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Normal"]
+position = Vector2( 385, 167 )
+rotation = 1.57079
+shape = SubResource( 1 )
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Normal"]
+position = Vector2( 901, 1572 )
+rotation = 1.57079
+shape = SubResource( 1 )
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="Normal"]
+position = Vector2( 2986, 1962 )
+rotation = 1.57079
+shape = SubResource( 1 )
+
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="Normal"]
+position = Vector2( 3195, 634 )
+rotation = 1.57079
+shape = SubResource( 1 )

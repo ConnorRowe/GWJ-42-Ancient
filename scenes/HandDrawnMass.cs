@@ -42,7 +42,8 @@ namespace Ancient
             // Numbers
             for (int i = 0; i < text.Length; i++)
             {
-                DrawTextureRectRegion(numbers, new Rect2(i * charSize.x, 0, charSize), new Rect2(charLUT[text[i]], 0, charSize), textColour);
+                if (charLUT.ContainsKey(text[i]))
+                    DrawTextureRectRegion(numbers, new Rect2(i * charSize.x, 0, charSize), new Rect2(charLUT[text[i]], 0, charSize), textColour);
             }
 
             // kg
