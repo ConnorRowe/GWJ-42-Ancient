@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=2]
+[gd_scene load_steps=30 format=2]
 
 [ext_resource path="res://scenes/characters/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://scenes/GameWorld.cs" type="Script" id=2]
@@ -19,16 +19,19 @@
 [ext_resource path="res://scenes/Trees.tscn" type="PackedScene" id=17]
 [ext_resource path="res://textures/volcano.png" type="Texture" id=18]
 [ext_resource path="res://shaders/SimpleBlur.gdshader" type="Shader" id=19]
+[ext_resource path="res://textures/UI/fps.png" type="Texture" id=20]
 [ext_resource path="res://shaders/MetaballBlood.gdshader" type="Shader" id=21]
+[ext_resource path="res://scenes/MeteorExplosion.tscn" type="PackedScene" id=22]
 
 [sub_resource type="ShaderMaterial" id=11]
 shader = ExtResource( 21 )
 shader_param/threshhold = 0.715
-shader_param/contrast = 1.126
-shader_param/base_colour = Color( 0.901961, 0.305882, 0.294118, 1 )
+shader_param/contrast = 2.194
+shader_param/border_threshhold = 0.213
+shader_param/border_colour = Color( 0.156863, 0.156863, 0.156863, 1 )
 
 [sub_resource type="ViewportTexture" id=12]
-viewport_path = NodePath("UI/BloodViewport")
+viewport_path = NodePath("UI/MetaballViewport")
 
 [sub_resource type="ShaderMaterial" id=4]
 shader = ExtResource( 14 )
@@ -86,8 +89,8 @@ tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0, 0.248906, 1.74234, 1.99125 ),
-"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"times": PoolRealArray( 0, 0.8, 1.25, 1.99125 ),
+"transitions": PoolRealArray( 1.93187, 1, 0.482968, 1 ),
 "update": 0,
 "values": [ 1.0, 0.1, 0.1, 1.0 ]
 }
@@ -278,20 +281,21 @@ limit_bottom = 2160
 
 [node name="UI" type="CanvasLayer" parent="."]
 
-[node name="BloodViewport" type="Viewport" parent="UI"]
+[node name="MetaballViewport" type="Viewport" parent="UI"]
 size = Vector2( 1920, 1080 )
+transparent_bg = true
 handle_input_locally = false
 hdr = false
 usage = 0
 render_target_v_flip = true
 render_target_update_mode = 3
+gui_snap_controls_to_pixels = false
+shadow_atlas_quad_0 = 0
+shadow_atlas_quad_1 = 0
+shadow_atlas_quad_2 = 0
+shadow_atlas_quad_3 = 0
 
-[node name="BloodBG" type="ColorRect" parent="UI/BloodViewport"]
-margin_right = 1920.0
-margin_bottom = 1080.0
-color = Color( 0, 0, 0, 1 )
-
-[node name="Camera2D" type="Camera2D" parent="UI/BloodViewport"]
+[node name="Camera2D" type="Camera2D" parent="UI/MetaballViewport"]
 current = true
 limit_left = 0
 limit_top = 0
@@ -301,7 +305,13 @@ __meta__ = {
 "_editor_description_": ""
 }
 
-[node name="BloodTexture" type="TextureRect" parent="UI"]
+[node name="MeteorExplosion" parent="UI/MetaballViewport" instance=ExtResource( 22 )]
+position = Vector2( 600, 600 )
+emitting = true
+one_shot = false
+
+[node name="MetaballTexture" type="TextureRect" parent="UI"]
+visible = false
 material = SubResource( 11 )
 margin_right = 1920.0
 margin_bottom = 1080.0
@@ -385,8 +395,23 @@ position = Vector2( 40, 110 )
 script = ExtResource( 12 )
 TextColour = Color( 0.192157, 0.133333, 0.172549, 1 )
 
+[node name="FpsText" type="Node2D" parent="UI"]
+position = Vector2( 1821, 17 )
+script = ExtResource( 12 )
+TextColour = Color( 0.192157, 0.133333, 0.172549, 1 )
+
+[node name="TextureRect" type="TextureRect" parent="UI/FpsText"]
+modulate = Color( 0.192157, 0.133333, 0.172549, 1 )
+margin_left = 49.0
+margin_top = 2.0
+margin_right = 91.0
+margin_bottom = 42.0
+texture = ExtResource( 20 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="WhiteOut" type="ColorRect" parent="UI"]
-visible = false
 margin_right = 1920.0
 margin_bottom = 1080.0
 color = Color( 0.929412, 0.929412, 0.929412, 0 )
@@ -395,7 +420,6 @@ __meta__ = {
 }
 
 [node name="Blur" type="ColorRect" parent="UI"]
-visible = false
 material = SubResource( 6 )
 margin_right = 1920.0
 margin_bottom = 1080.0

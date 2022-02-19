@@ -1,7 +1,7 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://scenes/characters/Raptor.tscn" type="PackedScene" id=1]
-[ext_resource path="res://scenes/characters/Herbivore.cs" type="Script" id=2]
+[ext_resource path="res://shaders/Shadow.gdshader" type="Shader" id=2]
 [ext_resource path="res://textures/stegohead.png" type="Texture" id=3]
 [ext_resource path="res://textures/stegobody.png" type="Texture" id=4]
 [ext_resource path="res://textures/stegolegrear.png" type="Texture" id=5]
@@ -10,6 +10,10 @@
 [sub_resource type="CapsuleShape2D" id=1]
 radius = 46.8113
 height = 88.5899
+
+[sub_resource type="ShaderMaterial" id=3]
+shader = ExtResource( 2 )
+shader_param/shadow_colour = Color( 0.192157, 0.133333, 0.172549, 0.490196 )
 
 [sub_resource type="Animation" id=4]
 resource_name = "QuadWalk"
@@ -82,16 +86,14 @@ radius = 47.0001
 height = 192.0
 
 [node name="Herbivore" instance=ExtResource( 1 )]
-script = ExtResource( 2 )
-acceleration = 1000.0
-maxSpeed = 2500.0
+Mass = 1500.0
+acceleration = 300.0
+maxSpeed = 1500.0
 movementDampening = 2.0
-mass = 50.0
-bodyPartPathsToFlip = [ NodePath("EatArea/CollisionShape2D"), NodePath("ArmBack"), NodePath("LFoot"), NodePath("Body"), NodePath("RFoot"), NodePath("Arm"), NodePath("Head"), NodePath("CollisionShape2D"), NodePath("CollisionShape2D3"), NodePath("Shadow") ]
+bodyPartPathsToFlip = [ NodePath("EatArea/CollisionShape2D"), NodePath("ArmBack"), NodePath("Shadow"), NodePath("LFoot"), NodePath("Body"), NodePath("RFoot"), NodePath("Arm"), NodePath("Head"), NodePath("CollisionShape2D"), NodePath("CollisionShape2D3") ]
+roamSpeedScale = 0.5
+biteMassDmg = 15.0
 walkAnimName = "QuadWalk"
-
-[node name="debug" parent="." index="2"]
-visible = true
 
 [node name="CollisionShape2D" parent="EatArea" index="0"]
 position = Vector2( 148.5, -56 )
@@ -99,6 +101,7 @@ rotation = 1.61823
 shape = SubResource( 1 )
 
 [node name="Shadow" parent="." index="4"]
+material = SubResource( 3 )
 margin_left = -158.0
 margin_top = -43.0
 margin_right = 159.0
@@ -150,3 +153,7 @@ shape = SubResource( 2 )
 
 [node name="CollisionShape2D3" parent="." index="13"]
 position = Vector2( 150.5, -54 )
+
+[node name="VisibilityEnabler2D" parent="." index="14"]
+position = Vector2( -248, -196 )
+rect = Rect2( -10, -10, 500, 300 )

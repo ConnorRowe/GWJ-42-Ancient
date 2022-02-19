@@ -86,16 +86,16 @@ tracks/4/keys = {
 "values": [ 13.0, -13.0, 13.0 ]
 }
 
-[sub_resource type="CapsuleShape2D" id=4]
-radius = 58.0001
-height = 71.9999
+[sub_resource type="CapsuleShape2D" id=8]
+radius = 73.0
+height = 64.0
 
 [sub_resource type="CircleShape2D" id=5]
 radius = 1000.0
 
 [node name="Player" type="KinematicBody2D"]
 script = ExtResource( 4 )
-mass = 0.5
+Mass = 0.5
 bodyPartPathsToFlip = [ NodePath("Head"), NodePath("Body"), NodePath("Arm"), NodePath("Tail"), NodePath("LFoot"), NodePath("RFoot"), NodePath("EatArea/CollisionShape2D"), NodePath("HeadShape"), NodePath("BodyShape") ]
 
 [node name="Shadow" type="ColorRect" parent="."]
@@ -142,13 +142,11 @@ texture = ExtResource( 6 )
 offset = Vector2( -11, 27 )
 
 [node name="HeadShape" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2( 8, -128 )
 rotation = 1.5708
 shape = SubResource( 1 )
 
 [node name="BodyShape" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2( -7, -48 )
 shape = SubResource( 2 )
 
@@ -162,9 +160,8 @@ input_pickable = false
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EatArea"]
-position = Vector2( 14, -127 )
-rotation = 1.57079
-shape = SubResource( 4 )
+position = Vector2( 41, -105 )
+shape = SubResource( 8 )
 
 [node name="EnemyDetectionArea" type="Area2D" parent="."]
 collision_layer = 0

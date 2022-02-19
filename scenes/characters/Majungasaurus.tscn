@@ -73,17 +73,19 @@ height = 156.0
 radius = 41.0003
 height = 76.0
 
-[node name="Raptor" instance=ExtResource( 1 )]
+[node name="Majungasaurus" instance=ExtResource( 1 )]
 script = ExtResource( 6 )
+Mass = 1000.0
 acceleration = 500.0
 maxSpeed = 2000.0
 movementDampening = 0.8
-mass = 200.0
 bodyPartPathsToFlip = [ NodePath("EatArea/CollisionShape2D"), NodePath("LFoot"), NodePath("Body"), NodePath("RFoot"), NodePath("Arm"), NodePath("Head"), NodePath("CollisionShape2D"), NodePath("CollisionShape2D3"), NodePath("Shadow") ]
+roamSpeedScale = 0.75
+biteMassDmg = 20.0
 
 [node name="CollisionShape2D" parent="EatArea" index="0"]
-position = Vector2( 158, -183 )
-rotation = 1.71023
+position = Vector2( 176, -124 )
+rotation = 0.0
 shape = SubResource( 3 )
 
 [node name="Shadow" parent="." index="4"]
@@ -135,3 +137,7 @@ shape = SubResource( 4 )
 position = Vector2( 151, -181 )
 rotation = 1.57079
 shape = SubResource( 5 )
+
+[node name="VisibilityEnabler2D" parent="." index="13"]
+position = Vector2( -229, -231 )
+rect = Rect2( -10, -10, 500, 300 )

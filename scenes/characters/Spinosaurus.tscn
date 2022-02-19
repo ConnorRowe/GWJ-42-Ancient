@@ -1,0 +1,78 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://scenes/characters/Raptor.tscn" type="PackedScene" id=1]
+[ext_resource path="res://textures/spinoarm.png" type="Texture" id=2]
+[ext_resource path="res://textures/spinoleg.png" type="Texture" id=3]
+[ext_resource path="res://textures/spinohead.png" type="Texture" id=4]
+[ext_resource path="res://textures/spinobody.png" type="Texture" id=5]
+
+[sub_resource type="CapsuleShape2D" id=1]
+radius = 99.0
+height = 22.0
+
+[sub_resource type="CapsuleShape2D" id=2]
+radius = 96.0003
+height = 103.999
+
+[sub_resource type="CapsuleShape2D" id=3]
+radius = 38.1626
+height = 100.218
+
+[node name="Spinosaurus" instance=ExtResource( 1 )]
+Mass = 12000.0
+acceleration = 1000.0
+maxSpeed = 3000.0
+movementDampening = 0.7
+biteMassDmg = 100.0
+
+[node name="CollisionShape2D" parent="EatArea" index="0"]
+position = Vector2( 252, -92 )
+rotation = 0.0
+shape = SubResource( 1 )
+
+[node name="Shadow" parent="." index="4"]
+margin_left = -112.0
+margin_top = -31.0
+margin_right = 260.0
+margin_bottom = 40.0
+
+[node name="LFoot" parent="." index="5"]
+position = Vector2( -18.0518, -118.769 )
+rotation = 0.0450404
+texture = ExtResource( 3 )
+offset = Vector2( 10.8012, 53.0316 )
+
+[node name="Body" parent="." index="6"]
+position = Vector2( -32, -173 )
+texture = ExtResource( 5 )
+
+[node name="RFoot" parent="." index="7"]
+position = Vector2( -27.5518, -120.769 )
+rotation = -0.0450404
+texture = ExtResource( 3 )
+offset = Vector2( 29.7906, 54.916 )
+
+[node name="Arm" parent="." index="8"]
+position = Vector2( 128, -117 )
+rotation = -0.0365953
+texture = ExtResource( 2 )
+offset = Vector2( 47.845, 27.8501 )
+
+[node name="Head" parent="." index="9"]
+position = Vector2( 186, -142 )
+rotation = -0.0315284
+texture = ExtResource( 4 )
+offset = Vector2( 59.6054, 4.29494 )
+
+[node name="CollisionShape2D" parent="." index="11"]
+position = Vector2( 39, -105 )
+shape = SubResource( 2 )
+
+[node name="CollisionShape2D3" parent="." index="12"]
+position = Vector2( 242, -134 )
+rotation = 1.75826
+shape = SubResource( 3 )
+
+[node name="VisibilityEnabler2D" parent="." index="13"]
+position = Vector2( -284, -258 )
+rect = Rect2( -10, -10, 650, 300 )

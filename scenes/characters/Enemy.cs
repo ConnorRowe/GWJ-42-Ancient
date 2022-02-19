@@ -16,6 +16,13 @@ namespace Ancient
         private Timer roamTimer;
         protected Player player;
         private Label debugLabel;
+        protected float maxRange = 1032256f;
+        [Export]
+        private float roamSpeedScale = 1f;
+        private bool canBite = true;
+        private Area2D eatArea;
+        [Export]
+        private float biteMassDmg = 1f;
 
         public override void _Ready()
         {
@@ -25,9 +32,11 @@ namespace Ancient
             roamTimer.Connect("timeout", this, nameof(RoamTimeout));
             GetNode<Timer>("AITick").Connect("timeout", this, nameof(AITick));
             debugLabel = GetNode<Label>("debug");
-            GetNode("EatArea").Connect("body_entered", this, nameof(EatAreaBodyEntered));
+            eatArea = GetNode<Area2D>("EatArea");
+            eatArea.Connect("body_entered", this, nameof(EatAreaBodyEntered));
 
             RoamTimeout();
+            roamTimer.Start();
         }
 
         private void RoamTimeout()
@@ -52,13 +61,13 @@ namespace Ancient
                     break;
                 case BehaviourState.HUNT:
                 case BehaviourState.FLEE:
-                    if (Position.DistanceSquaredTo(player.Position) > 1032256f)
+                    if (Position.DistanceSquaredTo(player.Position) > maxRange)
                     {
                         currentState = BehaviourState.ROAM;
                         RoamTimeout();
                         roamTimer.Start();
                     }
-                    else if (currentState == BehaviourState.HUNT && player.Mass > mass)
+                    else if (currentState == BehaviourState.HUNT && player.Mass > Mass)
                         currentState = BehaviourState.FLEE;
 
                     break;
@@ -76,9 +85,14 @@ namespace Ancient
                     debugLabel.Text = "flee";
                     break;
             }
+
+            if (currentState == BehaviourState.HUNT && eatArea.GetOverlappingBodies().Contains(player))
+            {
+                BitePlayer(player);
+            }
         }
 
-        public void DetectPlayer(Player player)
+        public virtual void DetectPlayer(Player player)
         {
             this.player = player;
 
@@ -99,7 +113,6 @@ namespace Ancient
             }
         }
 
-
         protected override Vector2 GetInputDir()
         {
             switch (currentState)
@@ -115,20 +128,43 @@ namespace Ancient
             return Vector2.Zero;
         }
 
+        protected override float GetMaxSpeed()
+        {
+            if (currentState == BehaviourState.ROAM)
+                return base.GetMaxSpeed() * roamSpeedScale;
+            else
+                return base.GetMaxSpeed();
+        }
+
         private void EatAreaBodyEntered(Node body)
         {
             if (body is Player p)
             {
-                if (p.Mass < mass)
+                if (p.Mass < Mass)
                 {
                     BitePlayer(p);
                 }
             }
         }
 
-        protected virtual void BitePlayer(Player player)
+        private void BitePlayer(Player player)
         {
-            GD.Print("YA GOTT ATE BOI");
+            if (!canBite)
+                return;
+
+            player.AddMass(-biteMassDmg);
+            player.AddHunger(-.15f);
+
+            player.ApplyExternalImpulse(Position.DirectionTo(player.Position) * 800f);
+
+            canBite = false;
+            GetTree().CreateTimer(.5f).Connect("timeout", this, nameof(ResetCanBite));
+
+        }
+
+        private void ResetCanBite()
+        {
+            canBite = true;
         }
     }
 }

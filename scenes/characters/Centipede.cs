@@ -20,11 +20,13 @@ namespace Ancient
 
         public override void _PhysicsProcess(float delta)
         {
+            base._PhysicsProcess(delta);
+
             physTimeFrac += delta * .5f;
             if (physTimeFrac > 1f)
                 physTimeFrac--;
 
-            float speedFactor = velocity.Length() / maxSpeed;
+            float speedFactor = velocity.Length() / GetMaxSpeed();
 
             animVal += speedFactor * Mathf.Pi * delta * 20f;
             if (animVal > Mathf.Tau)
@@ -35,10 +37,6 @@ namespace Ancient
             {
                 segments[i].Offset = baseSegOffset + new Vector2(0, Mathf.Cos(animVal + ((((float)i) / 3f) * Mathf.Tau)) * 6f);
             }
-
-            // TODO Mirror movement to collision shapes
-
-            base._PhysicsProcess(delta);
         }
     }
 }

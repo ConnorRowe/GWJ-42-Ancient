@@ -7,9 +7,9 @@
 [ext_resource path="res://textures/evildinoleg.png" type="Texture" id=5]
 [ext_resource path="res://scenes/characters/Raptor.cs" type="Script" id=6]
 
-[sub_resource type="CapsuleShape2D" id=1]
-radius = 31.6196
-height = 63.9996
+[sub_resource type="CapsuleShape2D" id=5]
+radius = 74.4017
+height = 0.0
 
 [sub_resource type="Animation" id=2]
 resource_name = "Walk"
@@ -75,22 +75,24 @@ height = 53.9994
 
 [node name="Raptor" instance=ExtResource( 1 )]
 script = ExtResource( 6 )
+Mass = 60.0
 acceleration = 500.0
 maxSpeed = 2000.0
 movementDampening = 0.8
-mass = 20.0
 bodyPartPathsToFlip = [ NodePath("EatArea/CollisionShape2D"), NodePath("LFoot"), NodePath("Body"), NodePath("RFoot"), NodePath("Arm"), NodePath("Head"), NodePath("CollisionShape2D"), NodePath("CollisionShape2D3"), NodePath("Shadow") ]
-
-[node name="Shadow" parent="." index="0"]
-margin_left = -89.0
-margin_top = -23.0
-margin_right = 89.0
-margin_bottom = 32.0
+roamSpeedScale = 0.75
+biteMassDmg = 3.0
 
 [node name="CollisionShape2D" parent="EatArea" index="0"]
 position = Vector2( 136, -64 )
 rotation = 1.96272
-shape = SubResource( 1 )
+shape = SubResource( 5 )
+
+[node name="Shadow" parent="." index="4"]
+margin_left = -89.0
+margin_top = -23.0
+margin_right = 89.0
+margin_bottom = 32.0
 
 [node name="LFoot" type="Sprite" parent="." index="5"]
 position = Vector2( 0.77301, -32.7499 )
@@ -131,3 +133,7 @@ shape = SubResource( 3 )
 position = Vector2( 132, -72 )
 rotation = 1.57079
 shape = SubResource( 4 )
+
+[node name="VisibilityEnabler2D" parent="." index="13"]
+position = Vector2( -194, -136 )
+rect = Rect2( -10, -10, 400, 200 )

@@ -11,11 +11,19 @@ height = 172.0
 
 [node name="Centipede" instance=ExtResource( 3 )]
 script = ExtResource( 4 )
+Mass = 10.0
 acceleration = 500.0
 maxSpeed = 1700.0
 movementDampening = 1.5
-mass = 2.0
-bodyPartPathsToFlip = [ NodePath("Head"), NodePath("Body1"), NodePath("Body2"), NodePath("Body3"), NodePath("BodyCollision"), NodePath("Shadow") ]
+bodyPartPathsToFlip = [ NodePath("Head"), NodePath("Body1"), NodePath("Body2"), NodePath("Body3"), NodePath("BodyCollision"), NodePath("Shadow"), NodePath("EatArea/CollisionShape2D") ]
+roamSpeedScale = 0.25
+
+[node name="debug" parent="." index="2"]
+margin_left = -96.0
+margin_top = 59.0
+margin_right = -56.0
+margin_bottom = 73.0
+rect_scale = Vector2( 2.8417, 2.8417 )
 
 [node name="Head" type="Sprite" parent="." index="3"]
 texture = ExtResource( 1 )
@@ -50,3 +58,7 @@ margin_bottom = 61.0
 position = Vector2( -75, 0 )
 rotation = 1.57079
 shape = SubResource( 1 )
+
+[node name="VisibilityEnabler2D" parent="." index="10"]
+position = Vector2( -263, -45 )
+rect = Rect2( -10, -10, 400, 120 )

@@ -1,0 +1,117 @@
+[gd_scene load_steps=12 format=2]
+
+[ext_resource path="res://shaders/Shadow.gdshader" type="Shader" id=1]
+[ext_resource path="res://icon.png" type="Texture" id=2]
+[ext_resource path="res://textures/meteoroidflames.png" type="Texture" id=3]
+[ext_resource path="res://textures/meteoroid.png" type="Texture" id=4]
+[ext_resource path="res://scenes/Meteoroid.cs" type="Script" id=5]
+
+[sub_resource type="ShaderMaterial" id=7]
+shader = ExtResource( 1 )
+shader_param/shadow_colour = Color( 0.192157, 0.133333, 0.172549, 0.490196 )
+
+[sub_resource type="Animation" id=8]
+resource_name = "Fall"
+length = 3.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("Shadow:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 2.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Shadow:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.2, 3 ),
+"transitions": PoolRealArray( 1, 2.2974, 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ), Vector2( 0.0625, 0.0175781 ), Vector2( 6.78125, 1.90723 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Meteor:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 3 ),
+"transitions": PoolRealArray( 1.31951, 1 ),
+"update": 0,
+"values": [ Vector2( 0, -1320 ), Vector2( 0, -88 ) ]
+}
+tracks/3/type = "method"
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 3 ),
+"transitions": PoolRealArray( 1 ),
+"values": [ {
+"args": [  ],
+"method": "Explode"
+} ]
+}
+
+[sub_resource type="AtlasTexture" id=9]
+flags = 4
+atlas = ExtResource( 3 )
+region = Rect2( 0, 0, 420, 480 )
+
+[sub_resource type="AtlasTexture" id=10]
+flags = 4
+atlas = ExtResource( 3 )
+region = Rect2( 420, 0, 420, 480 )
+
+[sub_resource type="AtlasTexture" id=11]
+flags = 4
+atlas = ExtResource( 3 )
+region = Rect2( 840, 0, 420, 480 )
+
+[sub_resource type="SpriteFrames" id=12]
+animations = [ {
+"frames": [ SubResource( 9 ), SubResource( 10 ), SubResource( 11 ) ],
+"loop": true,
+"name": "default",
+"speed": 8.0
+} ]
+
+[node name="Meteoroid" type="Node2D"]
+script = ExtResource( 5 )
+
+[node name="Shadow" type="Sprite" parent="."]
+modulate = Color( 1, 1, 1, 0 )
+material = SubResource( 7 )
+scale = Vector2( 1e-05, 1e-05 )
+texture = ExtResource( 2 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/Fall = SubResource( 8 )
+
+[node name="Meteor" type="Sprite" parent="."]
+position = Vector2( 0, -1320 )
+texture = ExtResource( 4 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="Meteor"]
+show_behind_parent = true
+position = Vector2( -12, -97 )
+frames = SubResource( 12 )
+frame = 1
+playing = true
+
+[node name="DetectionArea" type="Area2D" parent="."]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="DetectionArea"]
+visible = false
+polygon = PoolVector2Array( -213, 0, -119, -49, -1, -59, 114, -50, 212, 0, 116, 50, 0, 60, -126, 48 )

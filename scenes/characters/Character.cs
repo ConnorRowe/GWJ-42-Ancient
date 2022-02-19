@@ -4,8 +4,9 @@ using System.Collections.Generic;
 namespace Ancient
 {
     public class Character : KinematicBody2D
-    {
-        public float Mass { get { return mass; } }
+    {        
+        [Export]
+        public float Mass { get; set; }
         public bool IsFacingRight { get { return isFacingRight; } }
         public float SpeedScale { get; set; } = 1f;
 
@@ -18,8 +19,6 @@ namespace Ancient
         protected float movementDampening = 5f;
         protected Vector2 velocity = Vector2.Zero;
         protected Vector2 externalVelocity = Vector2.Zero;
-        [Export]
-        protected float mass = 1f;
         protected HashSet<Node> bodyPartsToFlip = new HashSet<Node>();
         [Export]
         private Godot.Collections.Array<NodePath> bodyPartPathsToFlip = new Godot.Collections.Array<NodePath>();
@@ -49,9 +48,9 @@ namespace Ancient
 
             externalVelocity -= (externalVelocity * 2f * delta);
 
-            if (velocity.Length() > maxSpeed * SpeedScale)
+            if (velocity.Length() > GetMaxSpeed() * SpeedScale)
             {
-                velocity = velocity.Normalized() * maxSpeed * SpeedScale;
+                velocity = velocity.Normalized() * GetMaxSpeed() * SpeedScale;
             }
 
             MoveAndSlide(velocity + externalVelocity);
@@ -71,6 +70,11 @@ namespace Ancient
 
             ZAsRelative = false;
             ZIndex = (int)GlobalPosition.y;
+        }
+
+        protected virtual float GetMaxSpeed()
+        {
+            return maxSpeed;
         }
 
         protected virtual Vector2 GetInputDir()

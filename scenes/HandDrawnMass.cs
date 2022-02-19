@@ -6,7 +6,7 @@ namespace Ancient
     {
         private static Texture numbers = GD.Load<Texture>("res://textures/UI/numbers.png");
         private static readonly Vector2 charSize = new Vector2(24, 36);
-        private Dictionary<char, int> charLUT = new Dictionary<char, int>() {
+        private static Dictionary<char, int> charLUT = new Dictionary<char, int>() {
             { '0', 0 },
             { '1', 24 },
             { '2', 48 },
@@ -20,6 +20,7 @@ namespace Ancient
             { '.', 240 },
         };
 
+        public bool DrawKG { get; set; } = true;
         [Export]
         public string Text
         {
@@ -46,8 +47,9 @@ namespace Ancient
                     DrawTextureRectRegion(numbers, new Rect2(i * charSize.x, 0, charSize), new Rect2(charLUT[text[i]], 0, charSize), textColour);
             }
 
-            // kg
-            DrawTextureRectRegion(numbers, new Rect2(text.Length * charSize.x, 0, charSize), new Rect2(264, 0, charSize), textColour);
+            // kg   
+            if (DrawKG)
+                DrawTextureRectRegion(numbers, new Rect2(text.Length * charSize.x, 0, charSize), new Rect2(264, 0, charSize), textColour);
         }
     }
 }

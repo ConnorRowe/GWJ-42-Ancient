@@ -1,0 +1,254 @@
+[gd_scene load_steps=21 format=2]
+
+[ext_resource path="res://scenes/characters/Player.tscn" type="PackedScene" id=1]
+[ext_resource path="res://scenes/HandDrawnMass.cs" type="Script" id=2]
+[ext_resource path="res://shaders/SimpleBlur.gdshader" type="Shader" id=3]
+[ext_resource path="res://shaders/MetaballBlood.gdshader" type="Shader" id=4]
+[ext_resource path="res://shaders/MassFill.gdshader" type="Shader" id=5]
+[ext_resource path="res://textures/UI/dashtext.png" type="Texture" id=6]
+[ext_resource path="res://textures/UI/massFill.png" type="Texture" id=7]
+[ext_resource path="res://textures/UI/dash_bg.png" type="Texture" id=8]
+[ext_resource path="res://textures/UI/dashcooldown.png" type="Texture" id=9]
+[ext_resource path="res://textures/UI/dash_fg.png" type="Texture" id=10]
+[ext_resource path="res://textures/UI/massBG.png" type="Texture" id=11]
+[ext_resource path="res://textures/UI/fps.png" type="Texture" id=12]
+[ext_resource path="res://textures/floors/earth.png" type="Texture" id=13]
+[ext_resource path="res://scenes/EarthWorld.cs" type="Script" id=14]
+
+[sub_resource type="CircleShape2D" id=6]
+radius = 44.0
+
+[sub_resource type="ShaderMaterial" id=7]
+shader = ExtResource( 4 )
+shader_param/threshhold = 0.715
+shader_param/contrast = 1.126
+shader_param/border_threshhold = 0.05
+shader_param/border_colour = Color( 0, 0, 0, 1 )
+
+[sub_resource type="ViewportTexture" id=8]
+viewport_path = NodePath("UI/MetaballViewport")
+
+[sub_resource type="ShaderMaterial" id=3]
+shader = ExtResource( 5 )
+shader_param/fill_colour = Color( 0.956863, 0.611765, 0.682353, 1 )
+shader_param/outline_colour = Color( 0.254902, 0.180392, 0.2, 1 )
+shader_param/outline_thickness = 2.56
+shader_param/uniform_scale = 5.0
+
+[sub_resource type="ShaderMaterial" id=4]
+shader = ExtResource( 3 )
+shader_param/lod = 0.0
+
+[sub_resource type="Animation" id=5]
+resource_name = "FadeIn"
+tracks/0/type = "value"
+tracks/0/path = NodePath("UI/WhiteOut:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 0.929412, 0.929412, 0.929412, 1 ), Color( 0.929412, 0.929412, 0.929412, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("UI/Blur:material:shader_param/lod")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ 5.0, 0.0 ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("UI/WhiteOut:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("UI/Blur:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+
+[node name="EarthWorld" type="Node2D"]
+script = ExtResource( 14 )
+
+[node name="TextureRect" type="TextureRect" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+texture = ExtResource( 13 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
+visible = false
+polygon = PoolVector2Array( -95, 1011, -1, 1011, 1, 534, 224, 457, 466, 405, 689, 377, 932, 365, 1218, 377, 1534, 420, 1783, 483, 1921, 532, 1918, 1080, -1, 1078, -1, 1011, -95, 1011, -98, 1224, 2017, 1240, 1996, 206, -92, 225 )
+
+[node name="Player" parent="." instance=ExtResource( 1 )]
+position = Vector2( 935, 548 )
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+current = true
+limit_left = 0
+limit_top = 0
+limit_right = 1920
+limit_bottom = 1080
+
+[node name="MeteorArea" type="Area2D" parent="Player"]
+collision_mask = 0
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player/MeteorArea"]
+shape = SubResource( 6 )
+
+[node name="MeteoroidTimer" type="Timer" parent="Player"]
+wait_time = 8.0
+autostart = true
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MetaballViewport" type="Viewport" parent="UI"]
+size = Vector2( 1920, 1080 )
+transparent_bg = true
+handle_input_locally = false
+hdr = false
+usage = 0
+render_target_v_flip = true
+render_target_update_mode = 3
+gui_snap_controls_to_pixels = false
+shadow_atlas_quad_0 = 0
+shadow_atlas_quad_1 = 0
+shadow_atlas_quad_2 = 0
+shadow_atlas_quad_3 = 0
+
+[node name="Camera2D" type="Camera2D" parent="UI/MetaballViewport"]
+current = true
+limit_left = 0
+limit_top = 0
+limit_right = 3840
+limit_bottom = 2160
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="MetaballTexture" type="TextureRect" parent="UI"]
+material = SubResource( 7 )
+margin_right = 1920.0
+margin_bottom = 1080.0
+texture = SubResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Dash" type="TextureProgress" parent="UI"]
+margin_left = 223.0
+margin_top = 45.0
+margin_right = 336.0
+margin_bottom = 138.0
+rect_pivot_offset = Vector2( 56, 46 )
+max_value = 1.0
+step = 0.0
+texture_under = ExtResource( 8 )
+texture_over = ExtResource( 10 )
+texture_progress = ExtResource( 9 )
+fill_mode = 5
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Text" type="TextureRect" parent="UI/Dash"]
+margin_left = 11.0
+margin_top = -33.0
+margin_right = 133.0
+margin_bottom = 130.0
+texture = ExtResource( 6 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Mass" type="TextureRect" parent="UI"]
+margin_left = 16.0
+margin_top = 24.0
+margin_right = 207.0
+margin_bottom = 137.0
+texture = ExtResource( 11 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Fill" type="TextureRect" parent="UI/Mass"]
+material = SubResource( 3 )
+margin_left = -13.0
+margin_top = -17.0
+margin_right = 210.0
+margin_bottom = 128.0
+rect_pivot_offset = Vector2( 111, 72 )
+texture = ExtResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Text" type="Node2D" parent="UI/Mass"]
+position = Vector2( 40, 110 )
+script = ExtResource( 2 )
+TextColour = Color( 0.192157, 0.133333, 0.172549, 1 )
+
+[node name="FpsText" type="Node2D" parent="UI"]
+position = Vector2( 1821, 17 )
+script = ExtResource( 2 )
+TextColour = Color( 0.192157, 0.133333, 0.172549, 1 )
+
+[node name="TextureRect" type="TextureRect" parent="UI/FpsText"]
+modulate = Color( 0.192157, 0.133333, 0.172549, 1 )
+margin_left = 49.0
+margin_top = 2.0
+margin_right = 91.0
+margin_bottom = 42.0
+texture = ExtResource( 12 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="WhiteOut" type="ColorRect" parent="UI"]
+visible = false
+margin_right = 1920.0
+margin_bottom = 1080.0
+color = Color( 0.929412, 0.929412, 0.929412, 0 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Blur" type="ColorRect" parent="UI"]
+visible = false
+material = SubResource( 4 )
+margin_right = 1920.0
+margin_bottom = 1080.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/FadeIn = SubResource( 5 )

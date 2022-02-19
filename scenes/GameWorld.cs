@@ -1,4 +1,5 @@
 using Godot;
+using System.Collections.Generic;
 
 namespace Ancient
 {
@@ -6,15 +7,15 @@ namespace Ancient
     {
         private static RandomNumberGenerator rng = Globals.RNG;
         private static PackedScene foodScene = GD.Load<PackedScene>("res://scenes/FoodPlant.tscn");
-        private static PackedScene bloodBurstScene = GD.Load<PackedScene>("res://scenes/BloodBurst.tscn");
-        private static Curve shakeCurve = GD.Load<Curve>("res://ShakeCurve.tres");
+        public static PackedScene bloodBurstScene = GD.Load<PackedScene>("res://scenes/BloodBurst.tscn");
+        public static Curve ShakeCurve { get; } = GD.Load<Curve>("res://ShakeCurve.tres");
         private static Color hungerFull = new Color("397cbe");
         private static Color hungerHungry = new Color("e64e4b");
         private static Color hungerStarving = new Color("31222c");
         private static readonly Vector2 levelBounds = new Vector2(3840, 2160);
         private const int MAX_PLANTS = 30;
         private const int MAX_DINOS = 5;
-        private static readonly float[] levelMassGoals = new float[3] { 25f, 500f, 2000f };
+        private static readonly float[] levelMassGoals = new float[3] { 100f, 2000f, 100000f };
         private static readonly Texture[] levelBackgrounds = new Texture[3]
         {
             GD.Load<Texture>("res://textures/floors/floor_grass.png"),
@@ -27,14 +28,28 @@ namespace Ancient
             GD.Load<Texture>("res://textures/bush.png"),
             GD.Load<Texture>("res://textures/tinytree.png")
         };
-        public static readonly PackedScene[] levelEnemies = new PackedScene[6]
+        private static readonly List<PackedScene>[] levelEnemies = new List<PackedScene>[3]
         {
-            GD.Load<PackedScene>("res://scenes/characters/Centipede.tscn"),
-            GD.Load<PackedScene>("res://scenes/characters/Raptor.tscn"),
-            GD.Load<PackedScene>("res://scenes/characters/Herbivore.tscn"),
-            GD.Load<PackedScene>("res://scenes/characters/Majungasaurus.tscn"),
-            GD.Load<PackedScene>("res://scenes/characters/Majungasaurus.tscn"),
-            GD.Load<PackedScene>("res://scenes/characters/Majungasaurus.tscn")
+            // Level 1
+            new List<PackedScene>()
+            {
+                GD.Load<PackedScene>("res://scenes/characters/Centipede.tscn"),
+                GD.Load<PackedScene>("res://scenes/characters/Raptor.tscn"),
+            },
+            // Level 2
+            new List<PackedScene>()
+            {
+                GD.Load<PackedScene>("res://scenes/characters/Raptor.tscn"),
+                GD.Load<PackedScene>("res://scenes/characters/Majungasaurus.tscn"),
+                GD.Load<PackedScene>("res://scenes/characters/Herbivore.tscn"),
+            },
+            // Level 3
+            new List<PackedScene>()
+            {
+                GD.Load<PackedScene>("res://scenes/characters/Herbivore.tscn"),
+                GD.Load<PackedScene>("res://scenes/characters/Spinosaurus.tscn"),
+                GD.Load<PackedScene>("res://scenes/characters/Dreadnoughtus.tscn"),
+            }
         };
 
         public int Level { get; set; } = 0;
@@ -65,8 +80,9 @@ namespace Ancient
         private TextureRect floorBG;
         private Node trees;
         private AnimationPlayer animPlayer;
-        private Node bloodBG;
-        private Camera2D bloodCamera;
+        private Viewport metaballViewport;
+        private Camera2D metaballCamera;
+        private HandDrawnMass fpsText;
 
         public override void _Ready()
         {
@@ -90,8 +106,13 @@ namespace Ancient
             floorBG = GetNode<TextureRect>("FloorBG");
             trees = GetNode("Trees");
             animPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-            bloodBG = GetNode("UI/BloodViewport/BloodBG");
-            bloodCamera = GetNode<Camera2D>("UI/BloodViewport/Camera2D");
+            metaballViewport = GetNode<Viewport>("UI/MetaballViewport");
+            metaballCamera = GetNode<Camera2D>("UI/MetaballViewport/Camera2D");
+            fpsText = GetNode<HandDrawnMass>("UI/FpsText"); fpsText.DrawKG = false;
+            player.Connect(nameof(Player.Dashed), this, nameof(ShakeDash));
+            player.Connect(nameof(Player.AteFoodPlant), this, nameof(PlayerAtePlant));
+            player.Connect(nameof(Player.AteEnemy), this, nameof(PlayerAteEnemy));
+            player.Connect(nameof(Player.TookDamage), this, nameof(PlayerTookDamage));
 
             foreach (Object obj in trees.GetNode("Giant").GetChildren() + trees.GetNode("Normal").GetChildren() + GetNode("Volcanos").GetChildren())
             {
@@ -105,13 +126,23 @@ namespace Ancient
             nextMassGoal = levelMassGoals[Level];
         }
 
+        public override void _Input(InputEvent evt)
+        {
+            base._Input(evt);
+
+            if (evt is InputEventKey ek && ek.Pressed && ek.Scancode == (int)KeyList.B)
+            {
+                MakeBloodBurst(player.GlobalPosition);
+            }
+        }
+
         public override void _Process(float delta)
         {
             timeFrac += delta;
             if (timeFrac > 1f)
                 timeFrac -= 1f;
 
-            float shake = shakeCurve.InterpolateBaked(timeFrac);
+            float shake = ShakeCurve.InterpolateBaked(timeFrac);
 
             // Hunger bar
 
@@ -156,7 +187,7 @@ namespace Ancient
             //Mass
             float p = Mathf.Clamp(player.Mass / nextMassGoal, 0f, 1f);
             massFillMat.SetShaderParam("uniform_scale", Mathf.Lerp(5f, 1f, p));
-            if (player.Mass > 0f)
+            if (player.Mass >= 0f)
                 massText.Text = player.Mass.ToString("0.00");
 
             player.Scale = player.Scale.LinearInterpolate(new Vector2(.5f + p, .5f + p), delta * 2f);
@@ -177,13 +208,15 @@ namespace Ancient
                 animPlayer.Play("WorldGrow");
                 IsWorldGrowing = true;
             }
+
+            fpsText.Text = $"{(int)Engine.GetFramesPerSecond()}";
         }
 
         public override void _PhysicsProcess(float delta)
         {
             base._PhysicsProcess(delta);
 
-            bloodCamera.GlobalPosition = player.GlobalPosition;
+            metaballCamera.GlobalPosition = player.GlobalPosition;
         }
 
         private void SpawnFoodTimerTick()
@@ -201,7 +234,7 @@ namespace Ancient
                     return;
 
                 FoodPlant foodPlant = foodScene.Instance<FoodPlant>();
-                foodPlant.FoodValue = ((Level + 1)) + rng.RandfRange(0f, Level * Level);
+                foodPlant.FoodValue = nextMassGoal * .016f;
                 foodPlant.Texture = levelHerbTextures[Level];
                 food = foodPlant;
                 CurrentPlantCount++;
@@ -215,7 +248,17 @@ namespace Ancient
                 if (rng.Randf() < .25f)
                     enemyID++;
 
-                food = levelEnemies[enemyID].Instance<Node2D>();
+                int enemyTypes = levelEnemies[Level].Count;
+                float chance = (1f / enemyTypes) + ((player.Mass / nextMassGoal) * .25f);
+                int successes = 0;
+                for (int i = 0; i < enemyTypes - 1; i++)
+                {
+                    if (rng.Randf() <= chance)
+                        successes++;
+                }
+
+                food = levelEnemies[Level][successes].Instance<Node2D>();
+
                 CurrentDinoCount++;
             }
 
@@ -249,9 +292,9 @@ namespace Ancient
 
                     if (child is Enemy enemy)
                     {
-                        enemy.CollisionLayer = enemy.CollisionMask = 0;
                         enemy.SpeedScale = .3f;
                         CurrentDinoCount--;
+                        enemy.Mass *= .5f;
                     }
                     else if (child is FoodPlant)
                     {
@@ -282,18 +325,41 @@ namespace Ancient
             }
         }
 
-        public void ShakeDash()
+        private void ShakeDash()
         {
             dashShakeTime = 1f;
         }
 
-        public void MakeBloodBurst(Vector2 globalPos)
+        private void MakeBloodBurst(Vector2 globalPos)
         {
-            Particles2D newBurst = bloodBurstScene.Instance<Particles2D>();
-            bloodBG.AddChild(newBurst);
+            AddMetaballParticles(metaballViewport, bloodBurstScene, globalPos);
+        }
+
+        public static void AddMetaballParticles(Viewport metaballViewport, PackedScene particleScene, Vector2 globalPos)
+        {
+            Particles2D newBurst = particleScene.Instance<Particles2D>();
+            metaballViewport.AddChild(newBurst);
             newBurst.GlobalPosition = globalPos;
-            GetTree().CreateTimer(1.5f).Connect("timeout", newBurst, "queue_free");
+            metaballViewport.GetTree().CreateTimer(newBurst.Lifetime).Connect("timeout", newBurst, "queue_free");
             newBurst.Emitting = true;
+        }
+
+        private void PlayerAtePlant()
+        {
+            CurrentPlantCount--;
+        }
+
+        private void PlayerAteEnemy(Enemy enemy)
+        {
+            if (enemy.Scale.x >= 1f)
+                CurrentDinoCount--;
+
+            MakeBloodBurst(enemy.GlobalPosition);
+        }
+
+        private void PlayerTookDamage()
+        {
+            MakeBloodBurst(player.GlobalPosition);
         }
     }
 }

@@ -12,15 +12,17 @@ namespace Ancient
         {
             base._Ready();
 
-            animPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-            animPlayer.Play(walkAnimName);
+            animPlayer = GetNodeOrNull<AnimationPlayer>("AnimationPlayer");
+            if (animPlayer != null)
+                animPlayer.Play(walkAnimName);
         }
 
         public override void _PhysicsProcess(float delta)
         {
             base._PhysicsProcess(delta);
 
-            animPlayer.PlaybackSpeed = (velocity.LengthSquared() + externalVelocity.LengthSquared()) * delta * .00015f;
+            if (animPlayer != null)
+                animPlayer.PlaybackSpeed = (velocity.LengthSquared() + externalVelocity.LengthSquared()) * delta * .00015f;
         }
     }
 }

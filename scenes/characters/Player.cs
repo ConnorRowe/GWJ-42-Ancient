@@ -4,11 +4,18 @@ namespace Ancient
 {
     public class Player : Character
     {
+        [Signal]
+        public delegate void Dashed();
+        [Signal]
+        public delegate void AteFoodPlant();
+        [Signal]
+        public delegate void AteEnemy();
+        [Signal]
+        public delegate void TookDamage();
+
         public bool IsInputLocked { get; set; } = false;
         public float Hunger { get { return hunger; } }
         public float DashCooldown { get; set; } = 0.0f;
-        public Diets Diet { get; set; } = Diets.Herb;
-        public GameWorld GameWorld { get { return gameWorld; } }
 
         private AnimationPlayer animationPlayer;
         private Sprite head;
@@ -20,7 +27,6 @@ namespace Ancient
         private CollisionShape2D headCollider;
         private CollisionShape2D bodyCollider;
         private Area2D eatArea;
-        private GameWorld gameWorld;
 
         private bool canTakeDamage = true;
         private bool isDead = false;
@@ -48,7 +54,6 @@ namespace Ancient
             eatArea = GetNode<Area2D>("EatArea");
             eatArea.Connect("area_entered", this, nameof(EatAreaEntered));
             eatArea.Connect("body_entered", this, nameof(EatAreaBodyEntered));
-            gameWorld = (GameWorld)Owner;
             GetNode("EnemyDetectionArea").Connect("body_entered", this, nameof(EnemyDetectionAreaBodyEntered));
 
             Scale = new Vector2(.5f, .5f);
@@ -62,13 +67,7 @@ namespace Ancient
                 DashCooldown = 1.0f;
                 hunger -= .1f;
 
-                gameWorld.ShakeDash();
-            }
-
-            if (evt is InputEventKey ek && ek.Pressed && ek.Scancode == (int)KeyList.B)
-            {
-                gameWorld.MakeBloodBurst(GlobalPosition);
-
+                EmitSignal(nameof(Dashed));
             }
         }
 
@@ -123,7 +122,7 @@ namespace Ancient
 
         private void EatAreaEntered(Area2D area)
         {
-            if (area.Owner is FoodPlant food && food.FoodType == Diet)
+            if (area.Owner is FoodPlant food)
             {
                 ConsumeFood(food);
                 area.Owner.QueueFree();
@@ -136,22 +135,20 @@ namespace Ancient
 
             AddMass(food.FoodValue);
 
-            gameWorld.CurrentPlantCount--;
+            EmitSignal(nameof(AteFoodPlant));
         }
 
         private void EatAreaBodyEntered(Node body)
         {
             if (body is Enemy enemy)
             {
-                if (enemy.Mass < mass)
+                if (enemy.Mass < Mass)
                 {
-                    mass += enemy.Mass;
+                    AddMass(enemy.Mass * .5f);
                     AddHunger(enemy.Mass * .5f);
                     enemy.QueueFree();
 
-                    gameWorld.CurrentDinoCount--;
-
-                    gameWorld.MakeBloodBurst(eatArea.GlobalPosition);
+                    EmitSignal(nameof(AteEnemy), enemy);
                 }
             }
         }
@@ -173,12 +170,18 @@ namespace Ancient
 
         public void AddMass(float mass)
         {
-            this.mass += mass;
+            Mass += mass;
 
-            if (mass <= 0f)
+            if (mass < 0f)
+            {
+                EmitSignal(nameof(TookDamage));
+            }
+
+            if (Mass <= 0f)
             {
                 //Die
-                mass = .1f;
+                Mass = 0f;
+                GD.Print("U DED");
             }
         }
     }
