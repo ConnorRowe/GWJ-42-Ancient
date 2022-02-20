@@ -15,7 +15,7 @@ Mass = 10.0
 acceleration = 500.0
 maxSpeed = 1700.0
 movementDampening = 1.5
-bodyPartPathsToFlip = [ NodePath("Head"), NodePath("Body1"), NodePath("Body2"), NodePath("Body3"), NodePath("BodyCollision"), NodePath("Shadow"), NodePath("EatArea/CollisionShape2D") ]
+bodyPartPathsToFlip = [ NodePath("Head"), NodePath("Body1"), NodePath("Body2"), NodePath("Body3"), NodePath("Shadow"), NodePath("EatArea/CollisionShape2D"), NodePath("BodyCollision") ]
 roamSpeedScale = 0.25
 
 [node name="debug" parent="." index="2"]

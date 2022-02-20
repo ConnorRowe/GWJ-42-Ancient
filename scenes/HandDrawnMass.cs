@@ -18,6 +18,7 @@ namespace Ancient
             { '8', 192 },
             { '9', 216 },
             { '.', 240 },
+            { ':', 288 },
         };
 
         public bool DrawKG { get; set; } = true;

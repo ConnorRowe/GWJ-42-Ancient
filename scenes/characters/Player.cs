@@ -12,6 +12,8 @@ namespace Ancient
         public delegate void AteEnemy();
         [Signal]
         public delegate void TookDamage();
+        [Signal]
+        public delegate void Died();
 
         public bool IsInputLocked { get; set; } = false;
         public float Hunger { get { return hunger; } }
@@ -86,8 +88,10 @@ namespace Ancient
 
             if (hunger <= 0.0f)
             {
-                // TODO LOST CONDITION
+                // TODO LOST CONDITION X
                 hunger = 0f;
+
+                EmitSignal(nameof(Died));
             }
 
             DashCooldown -= delta;
@@ -192,6 +196,7 @@ namespace Ancient
                 //Die
                 Mass = 0f;
                 GD.Print("U DED");
+                EmitSignal(nameof(Died));
             }
         }
     }

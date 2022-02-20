@@ -17,6 +17,7 @@ namespace Ancient
         private Control settingsControls;
         private TextureButton playButton;
         private TextureButton settingsButton;
+        private TextureRect logo;
         private int masterBusId;
         private int musicBusId;
         private int sfxBusId;
@@ -31,6 +32,7 @@ namespace Ancient
             musicSlider = GetNode<HSlider>("SettingsControls/MusicSlider");
             sfxSlider = GetNode<HSlider>("SettingsControls/SFXSlider");
             fullscreenToggle = GetNode<CheckButton>("SettingsControls/FullscreenToggle");
+            logo = GetNode<TextureRect>("Logo");
 
             masterBusId = AudioServer.GetBusIndex("Master");
             musicBusId = AudioServer.GetBusIndex("Music");
@@ -88,6 +90,7 @@ namespace Ancient
         {
             settingsControls.Visible = toggle;
             playButton.Visible = settingsButton.Visible = !toggle;
+            logo.Visible = !toggle;
         }
 
         public void RemoveFood(FoodPlant foodToRemove)

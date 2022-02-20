@@ -22,16 +22,20 @@ namespace Ancient
         {
             EmitSignal(nameof(Exploded), GlobalPosition);
 
-            GetNode<Sprite>("Meteor").Visible = false;
-            GetNode<Sprite>("Shadow").Visible = false;
-            FoodPlant bigMet = meteoriteScene.Instance<FoodPlant>();
             Node parent = GetParent();
-            parent.AddChild(bigMet);
-            bigMet.Position = Position;
-            bigMet.ZIndex = (int)Position.y;
-            bigMet.FoodValue = 166666f;
 
-            int tinyMetCount = Globals.RNG.RandiRange(1, 4);
+            if (Globals.RNG.Randf() > .5f)
+            {
+                GetNode<Sprite>("Meteor").Visible = false;
+                GetNode<Sprite>("Shadow").Visible = false;
+                FoodPlant bigMet = meteoriteScene.Instance<FoodPlant>();
+                parent.AddChild(bigMet);
+                bigMet.Position = Position;
+                bigMet.ZIndex = (int)Position.y;
+                bigMet.FoodValue = 25000f;
+            }
+
+            int tinyMetCount = Globals.RNG.RandiRange(0, 4);
             var tinyMetPositions = GetNode("TinyMetoriteSpawnPositions").GetChildren();
 
             for (int i = 0; i < tinyMetCount; i++)
@@ -44,7 +48,7 @@ namespace Ancient
                 parent.AddChild(tinyMet);
                 tinyMet.GlobalPosition = pos;
                 tinyMet.ZIndex = (int)pos.y;
-                tinyMet.FoodValue = 16666.6f;
+                tinyMet.FoodValue = 2500f;
             }
 
             Area2D detectionArea = GetNode<Area2D>("DetectionArea");
@@ -57,6 +61,36 @@ namespace Ancient
             }
 
             QueueFree();
+        }
+
+        public static Vector2[] GetSpacedCircumferancePoints(int numPoints, Vector2 gOrigin, float radius)
+        {
+            const float ellipseScalar = .5f;
+
+            float spacing = Mathf.Tau / numPoints;
+
+            Vector2[] outPoints = new Vector2[numPoints];
+            for (int i = 0; i < numPoints; i++)
+            {
+                float angle = spacing * i;
+                outPoints[i] = gOrigin + new Vector2(radius * Mathf.Cos(angle), radius * Mathf.Sin(angle) * ellipseScalar);
+            }
+
+            return outPoints;
+        }
+
+        public static Vector2[] GetSpacedPointsAlongLine(int numPoints, Vector2 gPosA, Vector2 gPosB)
+        {
+            float spacing = gPosA.DistanceTo(gPosB) / numPoints;
+            Vector2 dir = gPosA.DirectionTo(gPosB);
+
+            Vector2[] outPoints = new Vector2[numPoints];
+            for (int i = 0; i < numPoints; i++)
+            {
+                outPoints[i] = gPosA + (dir * spacing * i);
+            }
+
+            return outPoints;
         }
     }
 }

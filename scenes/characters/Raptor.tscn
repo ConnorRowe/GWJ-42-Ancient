@@ -75,7 +75,7 @@ height = 53.9994
 
 [node name="Raptor" instance=ExtResource( 1 )]
 script = ExtResource( 6 )
-Mass = 60.0
+Mass = 45.0
 acceleration = 500.0
 maxSpeed = 2000.0
 movementDampening = 0.8

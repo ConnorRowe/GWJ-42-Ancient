@@ -35,7 +35,7 @@ texture = ExtResource( 1 )
 offset = Vector2( -7, -176 )
 
 [node name="Sprite3" type="Sprite" parent="Normal"]
-position = Vector2( 2986, 1962 )
+position = Vector2( 2986, 1811 )
 texture = ExtResource( 1 )
 offset = Vector2( -10, -181 )
 
@@ -55,7 +55,7 @@ rotation = 1.57079
 shape = SubResource( 1 )
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="Normal"]
-position = Vector2( 2986, 1962 )
+position = Vector2( 2986, 1811 )
 rotation = 1.57079
 shape = SubResource( 1 )
 

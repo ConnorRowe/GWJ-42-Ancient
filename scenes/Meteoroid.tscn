@@ -107,7 +107,7 @@ texture = ExtResource( 4 )
 show_behind_parent = true
 position = Vector2( -12, -97 )
 frames = SubResource( 12 )
-frame = 1
+frame = 2
 playing = true
 
 [node name="DetectionArea" type="Area2D" parent="."]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=2]
+[gd_scene load_steps=26 format=2]
 
 [ext_resource path="res://textures/UI/button_pressed.png" type="Texture" id=1]
 [ext_resource path="res://textures/UI/button_normal.png" type="Texture" id=2]
@@ -20,6 +20,8 @@
 [ext_resource path="res://textures/UI/text_mastervol.png" type="Texture" id=18]
 [ext_resource path="res://textures/UI/text_back.png" type="Texture" id=19]
 [ext_resource path="res://textures/UI/toggle_on.png" type="Texture" id=20]
+[ext_resource path="res://textures/UI/logo.png" type="Texture" id=21]
+[ext_resource path="res://textures/UI/text_byme.png" type="Texture" id=22]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.823529, 0.823529, 0.729412, 1 )
@@ -46,6 +48,26 @@ script = ExtResource( 10 )
 margin_right = 1920.0
 margin_bottom = 1080.0
 texture = ExtResource( 12 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Logo" type="TextureRect" parent="."]
+margin_left = 403.0
+margin_top = 90.0
+margin_right = 1507.0
+margin_bottom = 572.0
+texture = ExtResource( 21 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="byme" type="TextureRect" parent="Logo"]
+margin_left = 780.0
+margin_top = 468.0
+margin_right = 1884.0
+margin_bottom = 950.0
+texture = ExtResource( 22 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -79,6 +101,9 @@ margin_right = 331.0
 margin_bottom = 105.0
 mouse_filter = 2
 texture = ExtResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="SettingsButton" type="TextureButton" parent="."]
 margin_left = 663.0

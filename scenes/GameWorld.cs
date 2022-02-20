@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using System;
 
 namespace Ancient
 {
@@ -9,6 +10,7 @@ namespace Ancient
         private static readonly PackedScene foodScene = GD.Load<PackedScene>("res://scenes/FoodPlant.tscn");
         public static readonly PackedScene bloodBurstScene = GD.Load<PackedScene>("res://scenes/BloodBurst.tscn");
         private static readonly PackedScene earthWorldScene = GD.Load<PackedScene>("res://scenes/EarthWorld.tscn");
+        public static readonly PackedScene deadMenuScene = GD.Load<PackedScene>("res://scenes/menus/DeadMenu.tscn");
         public static Curve ShakeCurve { get; } = GD.Load<Curve>("res://ShakeCurve.tres");
         private static Color hungerFull = new Color("397cbe");
         private static Color hungerHungry = new Color("e64e4b");
@@ -30,27 +32,27 @@ namespace Ancient
             GD.Load<Texture>("res://textures/bush.png"),
             GD.Load<Texture>("res://textures/tinytree.png")
         };
-        private static readonly List<PackedScene>[] levelEnemies = new List<PackedScene>[3]
+        private static readonly List<(PackedScene scene, float scale)>[] levelEnemies = new List<(PackedScene scene, float scale)>[3]
         {
             // Level 1
-            new List<PackedScene>()
+            new List<(PackedScene scene, float scale)>()
             {
-                GD.Load<PackedScene>("res://scenes/characters/Centipede.tscn"),
-                GD.Load<PackedScene>("res://scenes/characters/Raptor.tscn"),
+                (GD.Load<PackedScene>("res://scenes/characters/Centipede.tscn"), 1f),
+                (GD.Load<PackedScene>("res://scenes/characters/Raptor.tscn"), 1f),
             },
             // Level 2
-            new List<PackedScene>()
+            new List<(PackedScene scene, float scale)>()
             {
-                GD.Load<PackedScene>("res://scenes/characters/Raptor.tscn"),
-                GD.Load<PackedScene>("res://scenes/characters/Majungasaurus.tscn"),
-                GD.Load<PackedScene>("res://scenes/characters/Herbivore.tscn"),
+                (GD.Load<PackedScene>("res://scenes/characters/Raptor.tscn"), .3f),
+                (GD.Load<PackedScene>("res://scenes/characters/Majungasaurus.tscn"), 1f),
+                (GD.Load<PackedScene>("res://scenes/characters/Herbivore.tscn"), 1f),
             },
             // Level 3
-            new List<PackedScene>()
+            new List<(PackedScene scene, float scale)>()
             {
-                GD.Load<PackedScene>("res://scenes/characters/Herbivore.tscn"),
-                GD.Load<PackedScene>("res://scenes/characters/Spinosaurus.tscn"),
-                GD.Load<PackedScene>("res://scenes/characters/Dreadnoughtus.tscn"),
+                (GD.Load<PackedScene>("res://scenes/characters/Herbivore.tscn"), .25f),
+                (GD.Load<PackedScene>("res://scenes/characters/Spinosaurus.tscn"), 1f),
+                (GD.Load<PackedScene>("res://scenes/characters/Dreadnoughtus.tscn"), 1f),
             }
         };
 
@@ -58,7 +60,16 @@ namespace Ancient
         public int CurrentPlantCount { get; set; } = 0;
         public int CurrentDinoCount { get; set; } = 0;
         [Export]
-        public float TimeScale { get { return Engine.TimeScale; } set { Engine.TimeScale = value; animPlayer.PlaybackSpeed = 1f / value; } }
+        public float TimeScale
+        {
+            get { return Engine.TimeScale; }
+            set
+            {
+                Engine.TimeScale = value;
+                if (animPlayer != null)
+                    animPlayer.PlaybackSpeed = 1f / value;
+            }
+        }
         [Export]
         public bool IsWorldGrowing { get; set; } = false;
         private float timeFrac = 0.0f;
@@ -81,10 +92,12 @@ namespace Ancient
         private Camera2D camera;
         private TextureRect floorBG;
         private Node trees;
-        private AnimationPlayer animPlayer;
+        private AnimationPlayer animPlayer = null;
         private Viewport metaballViewport;
         private Camera2D metaballCamera;
         private HandDrawnMass fpsText;
+        private float speedRunTime = 0f;
+        private HandDrawnMass speedRunTimeText;
 
         public override void _Ready()
         {
@@ -115,8 +128,11 @@ namespace Ancient
             player.Connect(nameof(Player.AteFoodPlant), this, nameof(PlayerAtePlant));
             player.Connect(nameof(Player.AteEnemy), this, nameof(PlayerAteEnemy));
             player.Connect(nameof(Player.TookDamage), this, nameof(PlayerTookDamage));
+            player.Connect(nameof(Player.Died), this, nameof(PlayerDied));
+            speedRunTimeText = GetNode<HandDrawnMass>("UI/SpeedRunTimer");
+            speedRunTimeText.DrawKG = false;
 
-            foreach (Object obj in trees.GetNode("Giant").GetChildren() + trees.GetNode("Normal").GetChildren() + GetNode("Volcanos").GetChildren())
+            foreach (Godot.Object obj in trees.GetNode("Giant").GetChildren() + trees.GetNode("Normal").GetChildren() + GetNode("Volcanos").GetChildren())
             {
                 if (obj is Sprite sprite)
                 {
@@ -128,6 +144,7 @@ namespace Ancient
             nextMassGoal = levelMassGoals[Level];
 
             animPlayer.Play("FadeIn");
+            IsWorldGrowing = false;
         }
 
         public override void _Input(InputEvent evt)
@@ -142,6 +159,8 @@ namespace Ancient
 
         public override void _Process(float delta)
         {
+            speedRunTime += delta;
+
             timeFrac += delta;
             if (timeFrac > 1f)
                 timeFrac -= 1f;
@@ -212,9 +231,12 @@ namespace Ancient
                 animPlayer.Play("WorldGrow");
                 IsWorldGrowing = true;
                 GlobalSound.PlayWorldGrowSound();
+                GD.Print("start GrowWorld anim");
             }
 
             fpsText.Text = $"{(int)Engine.GetFramesPerSecond()}";
+            TimeSpan time = TimeSpan.FromSeconds(speedRunTime);
+            speedRunTimeText.Text = time.ToString(@"mm\:ss\:fff");
         }
 
         public override void _PhysicsProcess(float delta)
@@ -265,7 +287,10 @@ namespace Ancient
                         successes++;
                 }
 
-                food = levelEnemies[Level][successes].Instance<Node2D>();
+                var enemy = levelEnemies[Level][successes];
+
+                food = enemy.scene.Instance<Node2D>();
+                food.Scale = new Vector2(enemy.scale, enemy.scale);
 
                 CurrentDinoCount++;
             }
@@ -285,6 +310,7 @@ namespace Ancient
             if (Level == 3)
             {
                 EarthWorld.PlayerStartMass = player.Mass;
+                EarthWorld.SpeedRunStartTime = speedRunTime;
                 GetTree().ChangeSceneTo(earthWorldScene);
                 QueueFree();
                 Engine.TimeScale = 1f;
@@ -377,6 +403,21 @@ namespace Ancient
         private void PlayerTookDamage()
         {
             MakeBloodBurst(player.GlobalPosition);
+        }
+
+        private void PlayerDied()
+        {
+            player.IsInputLocked = true;
+            player.GetNode<ColorRect>("Shadow").Visible = false;
+            animPlayer.Play("PlayerDead");
+
+            GetTree().CreateTimer(4f).Connect("timeout", this, nameof(GameLost));
+        }
+
+        private void GameLost()
+        {
+            GetTree().ChangeSceneTo(deadMenuScene);
+            QueueFree();
         }
     }
 }

@@ -10,9 +10,12 @@ config_version=4
 
 [application]
 
-config/name="GWJ-42-Ancient"
-run/main_scene="res://scenes/menus/MainMenu.tscn"
+config/name="EatTheAsteroid"
+config/description="Made for the 42nd Godot Wild Jam."
+run/main_scene="res://scenes/menus/SplashScreen.tscn"
+boot_splash/image="res://textures/UI/gwj_splash.png"
 config/icon="res://icon.png"
+config/windows_native_icon="res://icon.ico"
 
 [autoload]
 
