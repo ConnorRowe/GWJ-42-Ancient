@@ -7,7 +7,7 @@ namespace Ancient
         private const float massGoal = 1000000f;
         private static PackedScene meteorExplosionScene = GD.Load<PackedScene>("res://scenes/MeteorExplosion.tscn");
         private static PackedScene meteoroidScene = GD.Load<PackedScene>("res://scenes/Meteoroid.tscn");
-        public static float PlayerStartMass { get; set; }
+        public static float PlayerStartMass { get; set; } = 100000f;
 
         private AnimationPlayer animPlayer;
         private Player player;
@@ -20,6 +20,7 @@ namespace Ancient
         private TextureProgress dash;
         private HandDrawnMass fpsText;
         private Viewport metaballViewport;
+        private AudioStreamPlayer explosionPlayer;
 
         private float timeFrac = 0;
         private float dashShakeTime = 0f;
@@ -43,6 +44,10 @@ namespace Ancient
             fpsText = GetNode<HandDrawnMass>("UI/FpsText"); fpsText.DrawKG = false;
             metaballViewport = GetNode<Viewport>("UI/MetaballViewport");
             GetNode<Timer>("Player/MeteoroidTimer").Connect("timeout", this, nameof(SpawnMeteoroid));
+            explosionPlayer = GetNode<AudioStreamPlayer>("ExplosionPlayer");
+            player.Connect(nameof(Player.TookDamage), this, nameof(PlayerTookDamage));
+            player.Mass = PlayerStartMass;
+
         }
 
         public override void _Process(float delta)
@@ -98,6 +103,11 @@ namespace Ancient
         private void MakeBloodBurst(Vector2 globalPos)
         {
             GameWorld.AddMetaballParticles(metaballViewport, GameWorld.bloodBurstScene, globalPos);
+        }
+
+        private void PlayerTookDamage()
+        {
+            MakeBloodBurst(player.GlobalPosition);
         }
 
         private void MakeMeteorExplosion(Vector2 globalPos)

@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://scenes/FoodPlant.tscn" type="PackedScene" id=1]
+[ext_resource path="res://textures/meteoritebig.png" type="Texture" id=2]
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 121.824
+
+[node name="MeteoriteBig" instance=ExtResource( 1 )]
+texture = ExtResource( 2 )
+offset = Vector2( 0, -95.424 )
+
+[node name="Shadow" parent="." index="0"]
+margin_left = -179.0
+margin_top = -70.0
+margin_right = -90.0
+margin_bottom = -44.0
+rect_scale = Vector2( 4.12, 4.12 )
+
+[node name="CollisionShape2D" parent="EatArea" index="0"]
+position = Vector2( 0, -100 )
+shape = SubResource( 1 )

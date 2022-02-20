@@ -6,8 +6,9 @@ namespace Ancient
     public class GameWorld : Node2D
     {
         private static RandomNumberGenerator rng = Globals.RNG;
-        private static PackedScene foodScene = GD.Load<PackedScene>("res://scenes/FoodPlant.tscn");
-        public static PackedScene bloodBurstScene = GD.Load<PackedScene>("res://scenes/BloodBurst.tscn");
+        private static readonly PackedScene foodScene = GD.Load<PackedScene>("res://scenes/FoodPlant.tscn");
+        public static readonly PackedScene bloodBurstScene = GD.Load<PackedScene>("res://scenes/BloodBurst.tscn");
+        private static readonly PackedScene earthWorldScene = GD.Load<PackedScene>("res://scenes/EarthWorld.tscn");
         public static Curve ShakeCurve { get; } = GD.Load<Curve>("res://ShakeCurve.tres");
         private static Color hungerFull = new Color("397cbe");
         private static Color hungerHungry = new Color("e64e4b");
@@ -16,6 +17,7 @@ namespace Ancient
         private const int MAX_PLANTS = 30;
         private const int MAX_DINOS = 5;
         private static readonly float[] levelMassGoals = new float[3] { 100f, 2000f, 100000f };
+        // private static readonly float[] levelMassGoals = new float[3] { 100, 100, 100 };
         private static readonly Texture[] levelBackgrounds = new Texture[3]
         {
             GD.Load<Texture>("res://textures/floors/floor_grass.png"),
@@ -124,6 +126,8 @@ namespace Ancient
             }
 
             nextMassGoal = levelMassGoals[Level];
+
+            animPlayer.Play("FadeIn");
         }
 
         public override void _Input(InputEvent evt)
@@ -207,6 +211,7 @@ namespace Ancient
                 //play world grow anim
                 animPlayer.Play("WorldGrow");
                 IsWorldGrowing = true;
+                GlobalSound.PlayWorldGrowSound();
             }
 
             fpsText.Text = $"{(int)Engine.GetFramesPerSecond()}";
@@ -226,6 +231,9 @@ namespace Ancient
 
         private void SpawnFood(Diets foodType)
         {
+            if (Level > 2)
+                return;
+
             Node2D food = null;
 
             if (foodType == Diets.Herb)
@@ -273,6 +281,15 @@ namespace Ancient
         public void GrowWorld()
         {
             Level++;
+
+            if (Level == 3)
+            {
+                EarthWorld.PlayerStartMass = player.Mass;
+                GetTree().ChangeSceneTo(earthWorldScene);
+                QueueFree();
+                Engine.TimeScale = 1f;
+                return;
+            }
 
             nextMassGoal = levelMassGoals[Level];
 

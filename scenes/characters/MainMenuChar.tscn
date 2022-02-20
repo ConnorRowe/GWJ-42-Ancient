@@ -1,29 +1,19 @@
-[gd_scene load_steps=20 format=2]
+[gd_scene load_steps=13 format=2]
 
-[ext_resource path="res://textures/Dinohead.png" type="Texture" id=1]
-[ext_resource path="res://textures/dinobody.png" type="Texture" id=2]
+[ext_resource path="res://textures/dinotalon.png" type="Texture" id=1]
+[ext_resource path="res://textures/dinotail.png" type="Texture" id=2]
 [ext_resource path="res://textures/dinoleg.png" type="Texture" id=3]
-[ext_resource path="res://scenes/characters/Player.cs" type="Script" id=4]
-[ext_resource path="res://textures/dinotail.png" type="Texture" id=5]
-[ext_resource path="res://textures/dinotalon.png" type="Texture" id=6]
+[ext_resource path="res://audio/chomp.wav" type="AudioStream" id=4]
+[ext_resource path="res://textures/dinobody.png" type="Texture" id=5]
+[ext_resource path="res://textures/Dinohead.png" type="Texture" id=6]
 [ext_resource path="res://shaders/Shadow.gdshader" type="Shader" id=7]
-[ext_resource path="res://audio/playerhit.wav" type="AudioStream" id=8]
-[ext_resource path="res://audio/chomp.wav" type="AudioStream" id=9]
-[ext_resource path="res://audio/whoosh.wav" type="AudioStream" id=10]
+[ext_resource path="res://scenes/characters/MainMenuChar.cs" type="Script" id=8]
 
-[sub_resource type="ShaderMaterial" id=7]
+[sub_resource type="ShaderMaterial" id=1]
 shader = ExtResource( 7 )
 shader_param/shadow_colour = Color( 0.192157, 0.133333, 0.172549, 0.490196 )
 
-[sub_resource type="CapsuleShape2D" id=1]
-radius = 35.0
-height = 22.0
-
-[sub_resource type="CapsuleShape2D" id=2]
-radius = 31.0
-height = 40.0
-
-[sub_resource type="Animation" id=3]
+[sub_resource type="Animation" id=2]
 resource_name = "Walk"
 length = 0.25
 loop = true
@@ -89,32 +79,21 @@ tracks/4/keys = {
 "values": [ 13.0, -13.0, 13.0 ]
 }
 
-[sub_resource type="CapsuleShape2D" id=8]
-radius = 73.0
-height = 64.0
-
-[sub_resource type="CircleShape2D" id=5]
-radius = 1000.0
-
-[sub_resource type="AudioStreamRandomPitch" id=9]
-audio_stream = ExtResource( 8 )
+[sub_resource type="AudioStreamRandomPitch" id=3]
+audio_stream = ExtResource( 4 )
 random_pitch = 1.5
 
-[sub_resource type="AudioStreamRandomPitch" id=10]
-audio_stream = ExtResource( 9 )
-random_pitch = 1.5
+[sub_resource type="CircleShape2D" id=4]
+radius = 45.0444
 
-[sub_resource type="AudioStreamRandomPitch" id=11]
-audio_stream = ExtResource( 10 )
-random_pitch = 1.5
-
-[node name="Player" type="KinematicBody2D"]
-script = ExtResource( 4 )
-Mass = 0.5
-bodyPartPathsToFlip = [ NodePath("Head"), NodePath("Body"), NodePath("Arm"), NodePath("Tail"), NodePath("LFoot"), NodePath("RFoot"), NodePath("EatArea/CollisionShape2D"), NodePath("HeadShape"), NodePath("BodyShape") ]
+[node name="MainMenuChar" type="KinematicBody2D"]
+script = ExtResource( 8 )
+acceleration = 1500.0
+maxSpeed = 3500.0
+bodyPartPathsToFlip = [ NodePath("RFoot"), NodePath("LFoot"), NodePath("Tail"), NodePath("Body"), NodePath("Head"), NodePath("Arm") ]
 
 [node name="Shadow" type="ColorRect" parent="."]
-material = SubResource( 7 )
+material = SubResource( 1 )
 margin_left = -65.0
 margin_top = -10.0
 margin_right = 62.0
@@ -138,66 +117,31 @@ offset = Vector2( 8, 19 )
 [node name="Tail" type="Sprite" parent="."]
 position = Vector2( -28, -42 )
 rotation = 0.139626
-texture = ExtResource( 5 )
+texture = ExtResource( 2 )
 offset = Vector2( -44, 13 )
 
 [node name="Body" type="Sprite" parent="."]
 position = Vector2( -6, -61.5 )
-texture = ExtResource( 2 )
+texture = ExtResource( 5 )
 
 [node name="Head" type="Sprite" parent="."]
 position = Vector2( 11, -130.5 )
 rotation = 0.0698132
-texture = ExtResource( 1 )
+texture = ExtResource( 6 )
 
 [node name="Arm" type="Sprite" parent="."]
 position = Vector2( -7, -74 )
 rotation = 0.226893
-texture = ExtResource( 6 )
+texture = ExtResource( 1 )
 offset = Vector2( -11, 27 )
 
-[node name="HeadShape" type="CollisionShape2D" parent="."]
-position = Vector2( 8, -128 )
-rotation = 1.5708
-shape = SubResource( 1 )
-
-[node name="BodyShape" type="CollisionShape2D" parent="."]
-position = Vector2( -7, -48 )
-shape = SubResource( 2 )
-
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-anims/Walk = SubResource( 3 )
-
-[node name="EatArea" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 3
-input_pickable = false
-monitorable = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="EatArea"]
-position = Vector2( 41, -105 )
-shape = SubResource( 8 )
-
-[node name="EnemyDetectionArea" type="Area2D" parent="."]
-collision_layer = 0
-input_pickable = false
-monitorable = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyDetectionArea"]
-position = Vector2( 0, -54 )
-shape = SubResource( 5 )
-
-[node name="HitPlayer" type="AudioStreamPlayer" parent="."]
-stream = SubResource( 9 )
-volume_db = -0.9
-bus = "SFX"
+anims/Walk = SubResource( 2 )
 
 [node name="ChompPlayer" type="AudioStreamPlayer" parent="."]
-stream = SubResource( 10 )
+stream = SubResource( 3 )
 volume_db = -3.496
 bus = "SFX"
 
-[node name="WhooshPlayer" type="AudioStreamPlayer" parent="."]
-stream = SubResource( 11 )
-volume_db = -3.496
-bus = "SFX"
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 4 )

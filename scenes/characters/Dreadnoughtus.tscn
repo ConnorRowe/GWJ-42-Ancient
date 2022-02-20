@@ -14,7 +14,7 @@ radius = 26.0
 height = 234.83
 
 [node name="Dreadnoughtus" instance=ExtResource( 1 )]
-Mass = 22000.0
+Mass = 28000.0
 movementDampening = 1.0
 bodyPartPathsToFlip = [ NodePath("EatArea/CollisionShape2D"), NodePath("ArmBack"), NodePath("LFoot"), NodePath("Body"), NodePath("RFoot"), NodePath("Arm"), NodePath("CollisionShape2D"), NodePath("CollisionShape2D3"), NodePath("Shadow") ]
 biteMassDmg = 50.0

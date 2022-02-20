@@ -11,8 +11,12 @@ config_version=4
 [application]
 
 config/name="GWJ-42-Ancient"
-run/main_scene="res://scenes/GameWorld.tscn"
+run/main_scene="res://scenes/menus/MainMenu.tscn"
 config/icon="res://icon.png"
+
+[autoload]
+
+GlobalSound="*res://scenes/GlobalSound.tscn"
 
 [display]
 

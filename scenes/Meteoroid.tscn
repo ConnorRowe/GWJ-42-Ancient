@@ -113,5 +113,21 @@ playing = true
 [node name="DetectionArea" type="Area2D" parent="."]
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="DetectionArea"]
-visible = false
 polygon = PoolVector2Array( -213, 0, -119, -49, -1, -59, 114, -50, 212, 0, 116, 50, 0, 60, -126, 48 )
+
+[node name="TinyMetoriteSpawnPositions" type="Node2D" parent="."]
+
+[node name="Position2D" type="Position2D" parent="TinyMetoriteSpawnPositions"]
+position = Vector2( -207, -7 )
+
+[node name="Position2D2" type="Position2D" parent="TinyMetoriteSpawnPositions"]
+position = Vector2( -109, 60 )
+
+[node name="Position2D3" type="Position2D" parent="TinyMetoriteSpawnPositions"]
+position = Vector2( 58, 49 )
+
+[node name="Position2D4" type="Position2D" parent="TinyMetoriteSpawnPositions"]
+position = Vector2( 154, 51 )
+
+[node name="Position2D5" type="Position2D" parent="TinyMetoriteSpawnPositions"]
+position = Vector2( 203, -14 )

@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/gamelose.wav-7eb88703e0ecada4bf523215a5ba8e6e.sample"
+
+[deps]
+
+source_file="res://audio/gamelose.wav"
+dest_files=[ "res://.import/gamelose.wav-7eb88703e0ecada4bf523215a5ba8e6e.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

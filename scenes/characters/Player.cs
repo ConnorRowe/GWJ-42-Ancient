@@ -27,6 +27,9 @@ namespace Ancient
         private CollisionShape2D headCollider;
         private CollisionShape2D bodyCollider;
         private Area2D eatArea;
+        private AudioStreamPlayer hitPlayer;
+        private AudioStreamPlayer chompPlayer;
+        private AudioStreamPlayer whooshPlayer;
 
         private bool canTakeDamage = true;
         private bool isDead = false;
@@ -55,6 +58,9 @@ namespace Ancient
             eatArea.Connect("area_entered", this, nameof(EatAreaEntered));
             eatArea.Connect("body_entered", this, nameof(EatAreaBodyEntered));
             GetNode("EnemyDetectionArea").Connect("body_entered", this, nameof(EnemyDetectionAreaBodyEntered));
+            hitPlayer = GetNode<AudioStreamPlayer>("HitPlayer");
+            chompPlayer = GetNode<AudioStreamPlayer>("ChompPlayer");
+            whooshPlayer = GetNode<AudioStreamPlayer>("WhooshPlayer");
 
             Scale = new Vector2(.5f, .5f);
         }
@@ -66,6 +72,7 @@ namespace Ancient
                 ApplyExternalImpulse(inputDir * 800f);
                 DashCooldown = 1.0f;
                 hunger -= .1f;
+                whooshPlayer.Play();
 
                 EmitSignal(nameof(Dashed));
             }
@@ -131,11 +138,12 @@ namespace Ancient
 
         private void ConsumeFood(FoodPlant food)
         {
-            AddHunger(food.FoodValue * .5f);
+            AddHunger(.25f);
 
             AddMass(food.FoodValue);
 
             EmitSignal(nameof(AteFoodPlant));
+            chompPlayer.Play(0);
         }
 
         private void EatAreaBodyEntered(Node body)
@@ -149,6 +157,7 @@ namespace Ancient
                     enemy.QueueFree();
 
                     EmitSignal(nameof(AteEnemy), enemy);
+                    chompPlayer.Play(0);
                 }
             }
         }
@@ -175,6 +184,7 @@ namespace Ancient
             if (mass < 0f)
             {
                 EmitSignal(nameof(TookDamage));
+                hitPlayer.Play(0);
             }
 
             if (Mass <= 0f)

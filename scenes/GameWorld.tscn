@@ -21,7 +21,6 @@
 [ext_resource path="res://shaders/SimpleBlur.gdshader" type="Shader" id=19]
 [ext_resource path="res://textures/UI/fps.png" type="Texture" id=20]
 [ext_resource path="res://shaders/MetaballBlood.gdshader" type="Shader" id=21]
-[ext_resource path="res://scenes/MeteorExplosion.tscn" type="PackedScene" id=22]
 
 [sub_resource type="ShaderMaterial" id=11]
 shader = ExtResource( 21 )
@@ -50,6 +49,34 @@ shader_param/uniform_scale = 5.0
 [sub_resource type="ShaderMaterial" id=6]
 shader = ExtResource( 19 )
 shader_param/lod = 0.0
+
+[sub_resource type="Animation" id=13]
+resource_name = "FadeIn"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:material:shader_param/lod")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.5 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ 0.0, 5.0, 0.0 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("../WhiteOut:color")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 0.156863, 0.156863, 0.156863, 1 ), Color( 0.156863, 0.156863, 0.156863, 0 ) ]
+}
 
 [sub_resource type="Animation" id=8]
 length = 0.001
@@ -305,13 +332,7 @@ __meta__ = {
 "_editor_description_": ""
 }
 
-[node name="MeteorExplosion" parent="UI/MetaballViewport" instance=ExtResource( 22 )]
-position = Vector2( 600, 600 )
-emitting = true
-one_shot = false
-
 [node name="MetaballTexture" type="TextureRect" parent="UI"]
-visible = false
 material = SubResource( 11 )
 margin_right = 1920.0
 margin_bottom = 1080.0
@@ -396,22 +417,22 @@ script = ExtResource( 12 )
 TextColour = Color( 0.192157, 0.133333, 0.172549, 1 )
 
 [node name="FpsText" type="Node2D" parent="UI"]
-position = Vector2( 1821, 17 )
+position = Vector2( 1821, 1 )
 script = ExtResource( 12 )
 TextColour = Color( 0.192157, 0.133333, 0.172549, 1 )
 
 [node name="TextureRect" type="TextureRect" parent="UI/FpsText"]
 modulate = Color( 0.192157, 0.133333, 0.172549, 1 )
 margin_left = 49.0
-margin_top = 2.0
 margin_right = 91.0
-margin_bottom = 42.0
+margin_bottom = 40.0
 texture = ExtResource( 20 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="WhiteOut" type="ColorRect" parent="UI"]
+visible = false
 margin_right = 1920.0
 margin_bottom = 1080.0
 color = Color( 0.929412, 0.929412, 0.929412, 0 )
@@ -430,5 +451,6 @@ __meta__ = {
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 pause_mode = 2
 root_node = NodePath("../UI/Blur")
+anims/FadeIn = SubResource( 13 )
 anims/RESET = SubResource( 8 )
 anims/WorldGrow = SubResource( 7 )

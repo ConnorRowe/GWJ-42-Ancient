@@ -19,7 +19,7 @@ radius = 38.1626
 height = 100.218
 
 [node name="Spinosaurus" instance=ExtResource( 1 )]
-Mass = 12000.0
+Mass = 18000.0
 acceleration = 1000.0
 maxSpeed = 3000.0
 movementDampening = 0.7
